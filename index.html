@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Principles of Diffusion Models: Toward Fast and Scalable Diffusion LLMs · NeurIPS 2026 Tutorial</title>
+  <meta name="description" content="A NeurIPS 2026 tutorial on fast diffusion-based generation across continuous and discrete data, with live demos attendees can adapt for their own research." />
+  <meta name="author" content="NeurIPS 2026 Tutorial Organizers" />
+  <meta name="theme-color" content="#0b1020" />
+
+  <!-- Open Graph / Twitter -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="The Principles of Diffusion Models: Toward Fast and Scalable Diffusion LLMs — NeurIPS 2026 Tutorial" />
+  <meta property="og:description" content="A NeurIPS 2026 tutorial on fast diffusion-based generation across continuous and discrete data, with live demos attendees can adapt for their own research." />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="The Principles of Diffusion Models: Toward Fast and Scalable Diffusion LLMs — NeurIPS 2026 Tutorial" />
+  <meta name="twitter:description" content="A NeurIPS 2026 tutorial on fast diffusion-based generation across continuous and discrete data, with live demos attendees can adapt for their own research." />
+
+  <!-- Favicon: inline SVG denoising-grid mark (no external file needed) -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230b1020'/%3E%3Cg fill='%235b53ff'%3E%3Crect x='5' y='5' width='6' height='6' rx='1.4' opacity='.35'/%3E%3Crect x='13' y='5' width='6' height='6' rx='1.4' opacity='.9'/%3E%3Crect x='21' y='5' width='6' height='6' rx='1.4' opacity='.5'/%3E%3C/g%3E%3Cg fill='%2312b3a6'%3E%3Crect x='5' y='13' width='6' height='6' rx='1.4' opacity='.85'/%3E%3Crect x='13' y='13' width='6' height='6' rx='1.4' opacity='.45'/%3E%3Crect x='21' y='13' width='6' height='6' rx='1.4' opacity='.95'/%3E%3C/g%3E%3Cg fill='%235b53ff'%3E%3Crect x='5' y='21' width='6' height='6' rx='1.4' opacity='.55'/%3E%3Crect x='13' y='21' width='6' height='6' rx='1.4' opacity='.95'/%3E%3Crect x='21' y='21' width='6' height='6' rx='1.4' opacity='.3'/%3E%3C/g%3E%3C/svg%3E" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400;1,8..60,600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ===================== Design tokens ===================== */
+    :root{
+      --ink:#0b1020;
+      --ink-2:#141b33;
+      --ink-3:#1d2645;
+      --paper:#f5f2ec;
+      --paper-2:#ece7dc;
+      --text:#1b2130;
+      --text-soft:#565c6d;
+      --accent:#5b53ff;
+      --accent-2:#12b3a6;
+      --accent-lt:#a09bff;     /* accent on dark */
+      --accent-2-lt:#4fd6cb;   /* teal on dark */
+      --line:#d9d2c4;
+      --line-soft:#e4ddd0;
+      --gold:#9a6d16;          /* TBD / tentative marker (AA on paper) */
+      --gold-lt:#e0b055;       /* TBD marker on dark */
+      --maxw:1180px;
+      --pad:clamp(20px, 5vw, 64px);
+      --r:14px;
+      --shadow:0 1px 2px rgba(11,16,32,.04), 0 12px 34px -18px rgba(11,16,32,.22);
+      --ff-display:"Source Serif 4", Georgia, "Times New Roman", serif;
+      --ff-body:"Newsreader", Georgia, serif;
+      --ff-mono:"JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    }
+
+    /* ===================== Base ===================== */
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth; -webkit-text-size-adjust:100%}
+    @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} }
+    body{
+      margin:0; background:var(--paper); color:var(--text);
+      font-family:var(--ff-body); font-size:19px; line-height:1.65;
+      font-weight:400; -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+      overflow-x:hidden;
+    }
+    h1,h2,h3,h4{font-family:var(--ff-display); font-weight:600; line-height:1.08; margin:0; letter-spacing:-.01em}
+    p{margin:0 0 1em}
+    a{color:inherit}
+    img{max-width:100%; display:block}
+    ::selection{background:var(--accent); color:#fff}
+    :focus-visible{outline:2.5px solid var(--accent); outline-offset:3px; border-radius:3px}
+    .skip{position:absolute; left:-999px; top:0; background:var(--ink); color:#fff; padding:12px 18px; z-index:200; border-radius:0 0 8px 0; font-family:var(--ff-mono); font-size:13px}
+    .skip:focus{left:0}
+
+    .wrap{max-width:var(--maxw); margin:0 auto; padding-inline:var(--pad)}
+    section{position:relative}
+
+    /* ===================== Shared type ===================== */
+    .eyebrow{
+      font-family:var(--ff-mono); font-size:12.5px; letter-spacing:.22em; text-transform:uppercase;
+      color:var(--text-soft); display:inline-flex; align-items:center; gap:.7em; margin:0 0 22px;
+    }
+    .eyebrow .idx{color:var(--accent); font-weight:600}
+    .eyebrow::before{content:""; width:26px; height:1px; background:var(--line); display:inline-block}
+    section.dark .eyebrow{color:#a7adc4}
+    section.dark .eyebrow::before{background:rgba(255,255,255,.22)}
+    section.dark .eyebrow .idx{color:var(--accent-lt)}
+
+    h2.h{font-size:clamp(30px, 4.6vw, 52px); letter-spacing:-.02em; max-width:16ch}
+    h2.h .it{font-style:italic; font-weight:400; color:var(--accent)}
+    section.dark h2.h .it{color:var(--accent-lt)}
+    .lead{font-size:clamp(19px,2.2vw,23px); color:var(--text-soft); max-width:60ch; line-height:1.6}
+    section.dark{background:var(--ink); color:#e9ebf4}
+    section.dark .lead{color:#aab0c6}
+
+    .pad-y{padding-block:clamp(72px, 11vw, 132px)}
+    .rule{height:1px; background:var(--line); border:0; margin:0}
+
+    code{
+      font-family:var(--ff-mono); font-size:.88em; letter-spacing:-.01em;
+      background:rgba(91,83,255,.08); border:1px solid var(--line); border-radius:5px;
+      padding:1px 6px; white-space:nowrap;
+    }
+    section.dark code, .cta-box code{
+      background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.18); color:#dfe2f0;
+    }
+
+    .tbd{
+      color:var(--gold); font-style:italic;
+      text-decoration:underline dotted rgba(154,109,22,.5); text-underline-offset:3px; cursor:help;
+    }
+    section.dark .tbd{color:var(--gold-lt); text-decoration-color:rgba(224,176,85,.5)}
+    .todo{display:inline-block; font-family:var(--ff-mono); font-size:.8em; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:#c0392b; background:rgba(192,57,43,.08); border:1px solid rgba(192,57,43,.4); border-radius:5px; padding:1px 7px}
+    section.dark .todo{color:#ff6f61; background:rgba(255,111,97,.12); border-color:rgba(255,111,97,.45)}
+
+    /* ===================== Buttons ===================== */
+    .btn{
+      display:inline-flex; align-items:center; gap:.55em; font-family:var(--ff-mono);
+      font-size:13.5px; letter-spacing:.04em; font-weight:500; padding:14px 22px; border-radius:999px;
+      text-decoration:none; border:1px solid transparent; cursor:pointer; transition:transform .18s ease, background .2s ease, box-shadow .2s ease, border-color .2s ease;
+      white-space:nowrap;
+    }
+    .btn-primary{background:var(--accent); color:#fff; box-shadow:0 10px 24px -10px rgba(91,83,255,.7)}
+    .btn-primary:hover{transform:translateY(-2px); box-shadow:0 16px 30px -12px rgba(91,83,255,.8)}
+    .btn-ghost{background:transparent; color:var(--text); border-color:var(--line)}
+    .btn-ghost:hover{border-color:var(--accent); color:var(--accent); transform:translateY(-2px)}
+    section.dark .btn-ghost{color:#fff; border-color:rgba(255,255,255,.28)}
+    section.dark .btn-ghost:hover{border-color:var(--accent-lt); color:var(--accent-lt)}
+    .hero .btn-ghost{color:#fff; border-color:rgba(255,255,255,.4)}
+    .hero .btn-ghost:hover{color:var(--accent-lt); border-color:var(--accent-lt)}
+    .btn .arr{font-size:1.05em; line-height:1}
+
+    /* ===================== Nav ===================== */
+    header.nav{position:fixed; inset:0 0 auto 0; z-index:100; transition:background .3s ease, box-shadow .3s ease, border-color .3s ease; border-bottom:1px solid transparent}
+    header.nav.scrolled{background:rgba(245,242,236,.85); backdrop-filter:saturate(160%) blur(12px); -webkit-backdrop-filter:saturate(160%) blur(12px); border-bottom-color:var(--line); box-shadow:0 1px 20px -12px rgba(11,16,32,.4)}
+    .nav-inner{display:flex; align-items:center; justify-content:space-between; gap:24px; height:68px; max-width:var(--maxw); margin:0 auto; padding-inline:var(--pad)}
+    .brand{display:flex; align-items:center; gap:11px; text-decoration:none; color:var(--paper); font-family:var(--ff-mono); font-size:13px; letter-spacing:.02em; line-height:1.15; transition:color .3s ease}
+    header.nav.scrolled .brand{color:var(--text)}
+    .brand .mark{width:26px; height:26px; flex:none; border-radius:7px}
+    .brand b{font-weight:600}
+    .brand .sub{color:var(--accent-lt)}
+    .brand .full{font-weight:400; opacity:.88}
+    header.nav.scrolled .brand .sub{color:var(--accent)}
+    .nav-links{display:flex; align-items:center; gap:4px; list-style:none; margin:0; padding:0}
+    .nav-links a{font-family:var(--ff-mono); font-size:12.5px; letter-spacing:.05em; text-transform:uppercase; text-decoration:none; color:rgba(245,242,236,.82); padding:8px 12px; border-radius:8px; transition:color .2s ease, background .2s ease}
+    header.nav.scrolled .nav-links a{color:var(--text-soft)}
+    .nav-links a:hover, .nav-links a.active{color:var(--accent-lt)}
+    header.nav.scrolled .nav-links a:hover, header.nav.scrolled .nav-links a.active{color:var(--accent); background:rgba(91,83,255,.07)}
+    .nav-links a.cta{color:#fff; background:var(--accent); margin-left:8px}
+    .nav-links a.cta:hover{background:#4a42e6; color:#fff}
+    header.nav.scrolled .nav-links a.cta{color:#fff; background:var(--accent)}
+    .nav-toggle{display:none; background:none; border:1px solid rgba(245,242,236,.3); color:var(--paper); width:42px; height:42px; border-radius:10px; font-size:20px; cursor:pointer; align-items:center; justify-content:center}
+    header.nav.scrolled .nav-toggle{color:var(--text); border-color:var(--line)}
+
+    /* Mobile drawer */
+    .drawer-backdrop{position:fixed; inset:0; background:rgba(11,16,32,.5); opacity:0; visibility:hidden; transition:opacity .3s ease, visibility .3s ease; z-index:110; backdrop-filter:blur(2px)}
+    .drawer-backdrop.open{opacity:1; visibility:visible}
+    @media (max-width:900px){
+      .nav-links{
+        position:fixed; top:0; right:0; height:100dvh; width:min(82vw, 340px); z-index:120;
+        background:var(--ink); flex-direction:column; align-items:stretch; gap:2px; padding:96px 22px 30px;
+        transform:translateX(100%); transition:transform .34s cubic-bezier(.2,.7,.2,1); box-shadow:-30px 0 60px -30px rgba(0,0,0,.6);
+      }
+      .nav-links.open{transform:translateX(0)}
+      .nav-links a{color:#d7dbe9; font-size:14px; padding:14px 14px; border-radius:10px}
+      header.nav.scrolled .nav-links a{color:#d7dbe9}
+      .nav-links a:hover, header.nav.scrolled .nav-links a:hover{color:#fff; background:rgba(255,255,255,.06)}
+      .nav-links a.cta{margin-left:0; margin-top:12px; justify-content:center; text-align:center; display:flex}
+      .nav-toggle{display:inline-flex}
+    }
+    @media (max-width:560px){ .brand .full{display:none} }
+
+    /* ===================== Hero ===================== */
+    .hero{position:relative; background:var(--ink); color:#fff; overflow:hidden; isolation:isolate}
+    #hero-canvas{position:absolute; inset:0; width:100%; height:100%; z-index:0; opacity:.55}
+    .hero-veil{position:absolute; inset:0; z-index:1; background:
+      radial-gradient(120% 90% at 20% 15%, rgba(11,16,32,.15), rgba(11,16,32,.72) 62%, rgba(11,16,32,.94) 100%),
+      linear-gradient(180deg, rgba(11,16,32,.55) 0%, rgba(11,16,32,.2) 40%, rgba(11,16,32,.85) 100%);}
+    .hero-inner{position:relative; z-index:2; max-width:var(--maxw); margin:0 auto; padding:150px var(--pad) 96px; min-height:100svh; display:flex; flex-direction:column; justify-content:center}
+    .hero .kicker{font-family:var(--ff-mono); font-size:13px; letter-spacing:.2em; text-transform:uppercase; color:var(--accent-lt); margin-bottom:26px; display:flex; align-items:center; gap:.8em; flex-wrap:wrap}
+    .hero .kicker .dot{width:6px; height:6px; border-radius:50%; background:var(--accent-2-lt); box-shadow:0 0 12px var(--accent-2-lt)}
+    .hero h1{font-size:clamp(38px, 6.6vw, 82px); line-height:1.02; letter-spacing:-.03em; max-width:16ch; margin-bottom:8px}
+    .hero h1 .acr{color:var(--accent-lt); letter-spacing:-.02em}
+    .hero h1 .grad{background:linear-gradient(100deg, var(--accent-lt), var(--accent-2-lt)); -webkit-background-clip:text; background-clip:text; color:transparent; font-style:italic; font-weight:400}
+    .hero .sub{font-size:clamp(18px, 2.3vw, 24px); color:#c6cbde; max-width:56ch; margin:22px 0 0; line-height:1.5}
+    .chips{display:flex; flex-wrap:wrap; gap:12px; margin:38px 0 40px}
+    .chip{display:flex; flex-direction:column; gap:3px; padding:12px 18px; border:1px solid rgba(255,255,255,.16); border-radius:12px; background:rgba(255,255,255,.03); backdrop-filter:blur(3px)}
+    .chip .k{font-family:var(--ff-mono); font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#9098b6}
+    .chip .v{font-family:var(--ff-display); font-size:19px; font-weight:600; color:#fff; letter-spacing:-.01em}
+    .chip.accent{border-color:rgba(160,155,255,.5); background:rgba(91,83,255,.12)}
+    .chip.accent .v{color:var(--accent-lt)}
+    .hero-actions{display:flex; flex-wrap:wrap; gap:14px; align-items:center}
+    .hero-actions .contact{font-family:var(--ff-mono); font-size:13px; letter-spacing:.03em; color:#c6cbde; text-decoration:none; border-bottom:1px solid rgba(255,255,255,.25); padding-bottom:2px; transition:color .2s, border-color .2s}
+    .hero-actions .contact:hover{color:#fff; border-color:var(--accent-lt)}
+    .scroll-hint{position:absolute; left:50%; bottom:26px; transform:translateX(-50%); z-index:2; font-family:var(--ff-mono); font-size:10.5px; letter-spacing:.2em; text-transform:uppercase; color:#8890b0; display:flex; flex-direction:column; align-items:center; gap:8px}
+    .scroll-hint .line{width:1px; height:36px; background:linear-gradient(var(--accent-lt), transparent); animation:pulse 2.4s ease-in-out infinite}
+    @keyframes pulse{0%,100%{opacity:.3; transform:scaleY(.6)}50%{opacity:1; transform:scaleY(1)}}
+    @media (prefers-reduced-motion: reduce){ .scroll-hint .line{animation:none} }
+
+
+    /* ===================== Topics ===================== */
+    .topics-grid{display:grid; grid-template-columns:repeat(2,1fr); border:1px solid var(--line); border-radius:var(--r); overflow:hidden; background:#fff}
+    .topic{display:flex; gap:16px; padding:20px 24px; border-bottom:1px solid var(--line-soft); border-right:1px solid var(--line-soft); align-items:baseline; transition:background .2s ease}
+    .topic:hover{background:var(--paper-2)}
+    .topic .n{font-family:var(--ff-mono); font-size:12px; color:var(--accent); font-weight:600; min-width:2.9em; letter-spacing:.04em}
+    .topic .t{font-size:17px; color:var(--text); line-height:1.4}
+    /* remove trailing borders responsibly */
+    .topics-grid .topic:nth-child(2n){border-right:0}
+
+    /* ===================== CFP ===================== */
+    .cfp-grid{display:grid; grid-template-columns:1.1fr .9fr; gap:clamp(28px,4vw,56px); align-items:start}
+    .cfp-copy h3{font-size:21px; margin:26px 0 8px}
+    .cfp-copy h3:first-child{margin-top:0}
+    .cfp-copy p{color:var(--text-soft); font-size:17.5px; max-width:56ch}
+    .cfp-list{list-style:none; margin:14px 0 0; padding:0; display:grid; gap:12px}
+    .cfp-list li{position:relative; padding-left:28px; color:var(--text-soft); font-size:16.5px; line-height:1.5}
+    .cfp-list li::before{content:""; position:absolute; left:4px; top:.62em; width:9px; height:9px; border-radius:2px; background:var(--accent); transform:rotate(45deg)}
+    .cfp-list li b{color:var(--text); font-weight:600}
+    .cfp-list li a{color:var(--accent); font-weight:600; text-decoration:underline; text-underline-offset:2px; text-decoration-thickness:1px; text-decoration-color:rgba(91,83,255,.4); transition:text-decoration-color .18s ease}
+    .cfp-list li a:hover{text-decoration-color:var(--accent)}
+    .cfp-list li a .arr{font-size:.82em}
+    .cfp-side{border:1px solid var(--line); border-radius:var(--r); background:#fff; padding:28px; position:sticky; top:88px}
+    .stat-row{display:grid; grid-template-columns:1fr 1fr; gap:6px 20px}
+    .stat{padding:16px 0; border-bottom:1px solid var(--line-soft)}
+    .stat:nth-last-child(-n+2){border-bottom:0}
+    .stat .num{font-family:var(--ff-display); font-size:38px; font-weight:600; letter-spacing:-.02em; line-height:1; color:var(--text)}
+    .stat .num .u{font-size:20px; color:var(--accent)}
+    .stat .lab{font-family:var(--ff-mono); font-size:11px; letter-spacing:.09em; text-transform:uppercase; color:var(--text-soft); margin-top:8px; line-height:1.4}
+    .cfp-note{margin-top:22px; padding-top:20px; border-top:1px solid var(--line-soft); font-size:14.5px; color:var(--text-soft); line-height:1.55}
+    .cfp-note a{color:var(--accent); text-decoration:underline; text-underline-offset:2px; word-break:break-word}
+    a.mail-inline{font-family:var(--ff-mono); font-size:.82em; color:var(--accent); text-decoration:underline; text-underline-offset:3px; word-break:break-word}
+    .cfp-cta{margin-top:22px; display:flex}
+    .cfp-cta .btn{width:100%; justify-content:center}
+
+    /* ===================== Dates (dark timeline) ===================== */
+    .timeline{position:relative; margin-top:20px; padding-left:34px}
+    .timeline::before{content:""; position:absolute; left:8px; top:6px; bottom:6px; width:2px; background:linear-gradient(var(--accent-lt), rgba(255,255,255,.12))}
+    .tl-item{position:relative; padding:16px 0 16px 6px; display:grid; grid-template-columns:190px 1fr; gap:20px; align-items:baseline; border-bottom:1px solid rgba(255,255,255,.08)}
+    .tl-item:last-child{border-bottom:0}
+    .tl-item::before{content:""; position:absolute; left:-34px; top:24px; width:12px; height:12px; border-radius:50%; background:var(--ink); border:2px solid rgba(255,255,255,.35); transform:translateX(2px)}
+    .tl-item.key::before{background:var(--accent); border-color:var(--accent-lt); box-shadow:0 0 0 5px rgba(91,83,255,.18)}
+    .tl-date{font-family:var(--ff-mono); font-size:14px; letter-spacing:.02em; color:#c6cbde; font-weight:500}
+    .tl-item.key .tl-date{color:var(--accent-lt)}
+    .tl-what{font-family:var(--ff-display); font-size:19px; color:#eef0f8}
+    .tl-item.key .tl-what{font-weight:600}
+    .tl-what .sm{display:block; font-family:var(--ff-mono); font-size:11.5px; letter-spacing:.04em; color:#8890b0; text-transform:uppercase; margin-top:3px}
+    .aoe-note{font-family:var(--ff-mono); font-size:12px; letter-spacing:.05em; color:#8890b0; margin-top:26px; text-transform:uppercase}
+
+    /* ===================== Schedule ===================== */
+    .sched{border:1px solid var(--line); border-radius:var(--r); overflow:hidden; background:#fff; margin-top:8px}
+    .sched-row{display:grid; grid-template-columns:150px 1fr auto; gap:20px; align-items:center; padding:15px 24px; border-bottom:1px solid var(--line-soft); transition:background .18s ease}
+    .sched-row:last-child{border-bottom:0}
+    .sched-row:hover{background:var(--paper)}
+    .sched-row .time{font-family:var(--ff-mono); font-size:14px; color:var(--text-soft); letter-spacing:.01em; white-space:nowrap}
+    .sched-row .what{font-size:18px; color:var(--text)}
+    .sched-row.talk .what{font-weight:500}
+    .sched-row .tag{font-family:var(--ff-mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; padding:4px 10px; border-radius:999px; border:1px solid var(--line); color:var(--text-soft)}
+    .sched-row.break{background:var(--paper-2)}
+    .sched-row.break .what{color:var(--text-soft); font-style:italic; font-family:var(--ff-body)}
+    .sched-row.break:hover{background:var(--paper-2)}
+    .sched-row.oral .tag{color:var(--accent); border-color:rgba(91,83,255,.35)}
+    .sched-row.headline .what{font-family:var(--ff-display); font-weight:600}
+    .sched-legend{font-family:var(--ff-mono); font-size:12px; color:var(--text-soft); margin-top:18px; letter-spacing:.03em}
+
+    /* ===================== People cards ===================== */
+    .people{display:grid; grid-template-columns:repeat(3,1fr); gap:22px; margin-top:8px}
+    .card{border:1px solid var(--line); border-radius:var(--r); background:#fff; padding:24px; display:flex; flex-direction:column; transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease}
+    .card:hover{transform:translateY(-4px); box-shadow:var(--shadow); border-color:var(--accent)}
+    .card-head{display:flex; gap:16px; align-items:center; margin-bottom:16px}
+    .avatar{position:relative; width:72px; height:72px; flex:none; border-radius:50%; overflow:hidden; background:linear-gradient(135deg,var(--accent),var(--accent-2)); display:flex; align-items:center; justify-content:center; box-shadow:inset 0 0 0 1px rgba(255,255,255,.15)}
+    .avatar.g2{background:linear-gradient(135deg,var(--accent-2),#0e8f86)}
+    .avatar.g3{background:linear-gradient(135deg,#7a72ff,#5b53ff)}
+    .avatar .mono-initials{font-family:var(--ff-mono); font-size:22px; font-weight:600; color:#fff; letter-spacing:.02em}
+    .avatar img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover}
+    .card-id .name{font-family:var(--ff-display); font-size:20px; font-weight:600; letter-spacing:-.01em; line-height:1.15}
+    .card-id .aff{font-family:var(--ff-mono); font-size:12px; letter-spacing:.02em; color:var(--text-soft); margin-top:5px; line-height:1.4}
+    .badge{display:inline-flex; align-items:center; gap:5px; font-family:var(--ff-mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--accent-2); background:rgba(18,179,166,.1); border:1px solid rgba(18,179,166,.3); padding:3px 9px; border-radius:999px; margin-top:9px; width:max-content}
+    .badge .d{width:5px; height:5px; border-radius:50%; background:var(--accent-2)}
+    .card .name a{color:inherit; text-decoration:none; border-bottom:1px solid transparent; transition:color .2s ease, border-color .2s ease}
+    .card .name a:hover{color:var(--accent); border-bottom-color:var(--accent)}
+    .card .bio{font-size:15px; color:var(--text-soft); line-height:1.55; margin:0}
+    .card .email{font-family:var(--ff-mono); font-size:12.5px; margin-top:14px; color:var(--accent); text-decoration:none; word-break:break-all; border-bottom:1px solid transparent; width:max-content; transition:border-color .2s}
+    .card .email:hover{border-bottom-color:var(--accent)}
+    .card-divider{height:1px; background:var(--line-soft); margin:0 0 14px}
+
+
+    /* ===================== Footer ===================== */
+    footer{background:var(--ink); color:#c6cbde; padding:44px 0; border-top:1px solid rgba(255,255,255,.1); text-align:center; font-family:var(--ff-mono)}
+    footer p{margin:0}
+    .foot-links{display:flex; justify-content:center; flex-wrap:wrap; gap:6px 16px; font-size:16px}
+    .foot-links a{color:#c6cbde; text-decoration:none; transition:color .2s}
+    .foot-bottom{margin-top:14px; font-size:14px; color:#8890b0; line-height:1.6}
+    .foot-bottom a{color:#c6cbde; text-decoration:underline; text-underline-offset:3px; transition:color .2s}
+    footer a:hover{color:var(--accent-lt)}
+
+    /* ===================== Inline links ===================== */
+    .sched a, .card .links a{color:var(--accent); text-decoration:underline; text-underline-offset:2px; text-decoration-thickness:1px; text-decoration-color:rgba(91,83,255,.4); transition:text-decoration-color .18s ease}
+    .sched a:hover, .card .links a:hover{text-decoration-color:var(--accent)}
+
+    /* ===================== Schedule parts ===================== */
+    .sched-head{display:flex; justify-content:space-between; align-items:flex-end; gap:24px; flex-wrap:wrap; padding:26px 24px 22px; border-bottom:1px solid var(--line); background:linear-gradient(180deg,var(--paper),#fff); position:relative}
+    .sched-head::before{content:""; position:absolute; inset:0 0 auto 0; height:3px; background:linear-gradient(90deg,var(--accent),var(--accent-2))}
+    .sched-head .pno{font-family:var(--ff-mono); font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--accent)}
+    .sched-head h3{font-size:26px; margin:8px 0 6px; letter-spacing:-.01em}
+    .sched-head p{margin:0; color:var(--text-soft); font-size:16.5px; max-width:58ch; line-height:1.5}
+    .sched-head .inst{font-family:var(--ff-mono); font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--text-soft); display:flex; flex-direction:column; gap:4px}
+    .sched-head .inst b{font-family:var(--ff-display); font-size:18px; font-weight:600; letter-spacing:-.01em; text-transform:none; color:var(--text)}
+    .sched-row{align-items:baseline}
+    .sched-row .time{color:var(--accent); font-weight:500; letter-spacing:.06em}
+    .sched-row.break .time{color:var(--text-soft)}
+    .sched-row .what .sm{display:block; font-family:var(--ff-body); font-weight:400; font-size:15.5px; color:var(--text-soft); line-height:1.5; margin-top:5px; max-width:70ch}
+    .sub-list{list-style:none; margin:8px 0 2px; padding:0; display:grid; gap:5px; font-weight:400; font-size:15.5px; color:var(--text-soft); line-height:1.5}
+    .sub-list li{position:relative; padding-left:18px}
+    .sub-list li::before{content:""; position:absolute; left:2px; top:.62em; width:6px; height:6px; border-radius:1.5px; background:var(--accent); opacity:.7; transform:rotate(45deg)}
+    a.cite{font-family:var(--ff-mono); font-size:.85em; text-decoration:none}
+
+    /* ===================== People extras ===================== */
+    .card .links{display:flex; flex-wrap:wrap; gap:6px 16px; margin:auto 0 0; padding-top:16px; font-family:var(--ff-mono); font-size:12.5px}
+
+    /* ===================== Materials (dark) ===================== */
+    .mat-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:22px; margin-top:40px}
+    .mat{border:1px solid rgba(255,255,255,.14); border-radius:var(--r); background:rgba(255,255,255,.03); padding:26px 26px 28px}
+    .mat h3{font-size:22px; color:#fff; letter-spacing:-.01em; padding-bottom:16px; border-bottom:1px solid rgba(255,255,255,.1)}
+    .mat h4{font-family:var(--ff-mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#8890b0; font-weight:500; margin:22px 0 10px}
+    .mat ul{list-style:none; margin:0; padding:0; display:grid; gap:12px}
+    .mat li{font-size:16.5px; line-height:1.4; color:#c6cbde; scroll-margin-top:96px}
+    .mat li a{color:var(--accent-lt); text-decoration:underline; text-underline-offset:3px; text-decoration-thickness:1px; text-decoration-color:rgba(160,155,255,.4); transition:color .2s, text-decoration-color .2s}
+    .mat li a:hover{color:#fff; text-decoration-color:#fff}
+    .mat li .by{display:block; font-family:var(--ff-mono); font-size:11.5px; letter-spacing:.01em; color:#8890b0; margin-top:5px; line-height:1.5}
+    .mat li:target{outline:1px solid var(--accent-lt); outline-offset:8px; border-radius:6px}
+
+    section[id]{scroll-margin-top:60px}
+    @media (max-width:900px){ .mat-grid{grid-template-columns:1fr} }
+
+    /* Centered hero; title sized so each of its two lines fits on one row */
+    .hero-inner{align-items:center; text-align:center; max-width:1400px}
+    .hero .kicker{justify-content:center; font-size:clamp(14px, 1.5vw, 18px); margin-bottom:30px}
+    .hero h1{font-size:clamp(22px, 4.5vw, 64px); line-height:1.14; letter-spacing:-.025em; max-width:none}
+    .hero h1 .ln{display:block}
+    .hero .sub{margin-inline:auto}
+    .chips, .hero-actions{justify-content:center}
+
+    /* ===================== Reveal animation ===================== */
+    [data-reveal]{opacity:0; transform:translateY(22px); transition:opacity .7s cubic-bezier(.2,.7,.2,1), transform .7s cubic-bezier(.2,.7,.2,1)}
+    [data-reveal].in{opacity:1; transform:none}
+    @media (prefers-reduced-motion: reduce){ [data-reveal]{opacity:1; transform:none; transition:none} }
+
+    /* ===================== Responsive ===================== */
+    @media (max-width:900px){
+      body{font-size:18px}
+      .cfp-grid, .funding-inner{grid-template-columns:1fr}
+      .cfp-side{position:static}
+      .people{grid-template-columns:repeat(2,1fr)}
+    }
+    @media (max-width:640px){
+      .topics-grid{grid-template-columns:1fr}
+      .topics-grid .topic{border-right:0}
+      .people{grid-template-columns:1fr}
+      .stat-row{grid-template-columns:1fr 1fr}
+      .tl-item{grid-template-columns:1fr; gap:4px}
+      .sched-row{grid-template-columns:104px 1fr; gap:12px}
+      .sched-row .tag{grid-column:2; justify-self:start}
+      .hero-actions{flex-direction:column; align-items:stretch}
+      .hero-actions .btn{justify-content:center}
+      .hero-actions .contact{text-align:center; margin-top:6px}
+    }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#speakers">Skip to content</a>
+
+  <!-- ===================== NAV ===================== -->
+  <header class="nav" id="nav">
+    <div class="nav-inner">
+      <a class="brand" href="#home" aria-label="The Principles of Diffusion Models, a NeurIPS 2026 tutorial — home">
+        <svg class="mark" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="6" fill="#5b53ff"/><g fill="#fff"><rect x="5" y="5" width="6" height="6" rx="1.4" opacity=".4"/><rect x="13" y="5" width="6" height="6" rx="1.4" opacity=".95"/><rect x="21" y="5" width="6" height="6" rx="1.4" opacity=".55"/><rect x="5" y="13" width="6" height="6" rx="1.4" opacity=".9"/><rect x="13" y="13" width="6" height="6" rx="1.4" opacity=".45"/><rect x="21" y="13" width="6" height="6" rx="1.4" opacity=".95"/><rect x="5" y="21" width="6" height="6" rx="1.4" opacity=".55"/><rect x="13" y="21" width="6" height="6" rx="1.4" opacity=".95"/><rect x="21" y="21" width="6" height="6" rx="1.4" opacity=".35"/></g></svg>
+        <span><b>Principles of Diffusion<span class="full">: Fast &amp; Scalable Diffusion LLMs</span></b><br><span class="sub">NeurIPS 2026 Tutorial</span></span>
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-label="Open navigation menu" aria-expanded="false" aria-controls="navLinks">☰</button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#speakers">Speakers</a></li>
+        <li><a href="#schedule">Schedule</a></li>
+        <li><a href="#materials">Materials</a></li>
+        <li><a class="cta" href="mailto:chieh-hsin.lai@sony.com,subham.sahoo@mbzuai.ac.ae">Contact</a></li>
+      </ul>
+    </div>
+  </header>
+  <div class="drawer-backdrop" id="drawerBackdrop" hidden></div>
+
+  <main>
+    <!-- ===================== HERO ===================== -->
+    <section class="hero" id="home">
+      <canvas id="hero-canvas" aria-hidden="true"></canvas>
+      <div class="hero-veil" aria-hidden="true"></div>
+      <div class="hero-inner">
+        <p class="kicker"><span class="dot" aria-hidden="true"></span> A NeurIPS 2026 Tutorial · Sydney, Australia</p>
+        <h1><span class="ln">The Principles of Diffusion Models:</span> <span class="ln">Toward <span class="grad">Fast and Scalable</span> Diffusion LLMs</span></h1>
+        <p class="sub">A concise, hands-on tutorial on fast diffusion-based generation across continuous and discrete data, with live demos you can adapt for your own research.</p>
+        <div class="chips">
+          <div class="chip accent"><span class="k">Date</span><span class="v">Mon, Dec 7, 2026</span></div>
+          <div class="chip"><span class="k">Time</span><span class="v">9:00 AM AEDT</span></div>
+          <div class="chip"><span class="k">Room</span><span class="v">TikTok Ent Centre</span></div>
+          <div class="chip"><span class="k">Format</span><span class="v">Lectures + live demos</span></div>
+        </div>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#schedule">View the schedule <span class="arr" aria-hidden="true">↓</span></a>
+          <a class="btn btn-ghost" href="#materials">Slides &amp; notebooks</a>
+        </div>
+      </div>
+      <div class="scroll-hint" aria-hidden="true"><span>Scroll</span><span class="line"></span></div>
+    </section>
+
+    <!-- ===================== SPEAKERS ===================== -->
+    <section id="speakers" class="pad-y">
+      <div class="wrap">
+        <div data-reveal>
+          <p class="eyebrow"><span class="idx">01</span> Speakers</p>
+          <h2 class="h">Three <span class="it">instructors</span>.</h2>
+        </div>
+        <div class="people" data-reveal style="margin-top:38px">
+          <article class="card">
+            <div class="card-head">
+              <div class="avatar g1"><span class="mono-initials">CL</span><img src="assets/people/lai.jpg" alt="Portrait of Chieh-Hsin (Jesse) Lai" loading="lazy" onerror="this.remove()"></div>
+              <div class="card-id"><div class="name"><a href="https://chiehhsinjesselai.github.io/ChiehHsinLai/" target="_blank" rel="noopener">Chieh-Hsin (Jesse) Lai</a></div><div class="aff">Sony AI</div></div>
+            </div>
+            <div class="card-divider"></div>
+            <p class="bio">Chieh-Hsin (Jesse) Lai received his Ph.D. in Mathematics from the University of Minnesota in 2021. He is currently a Staff Research Scientist at Sony AI and a Visiting Assistant Professor in the Department of Applied Mathematics at National Yang Ming Chiao Tung University (Taiwan). His research focuses on deep generative modeling (with an emphasis on diffusion models) and AI for science. He has organized and delivered tutorials on generative AI at ISMIR 2024, ICASSP 2025, and IJCNN 2025. Recently, he led and authored a book, <i>The Principles of Diffusion Models</i>, which provides a systematic treatment of the foundations of diffusion models.</p>
+            <p class="links"><a href="https://chiehhsinjesselai.github.io/ChiehHsinLai/" target="_blank" rel="noopener">Website ↗</a><a href="https://scholar.google.co.jp/citations?user=KDnKGu8AAAAJ&amp;hl=en" target="_blank" rel="noopener">Google Scholar ↗</a></p>
+          </article>
+          <article class="card">
+            <div class="card-head">
+              <div class="avatar g2"><span class="mono-initials">YM</span><img src="assets/people/mitsufuji.jpg" alt="Portrait of Yuki Mitsufuji" loading="lazy" onerror="this.remove()"></div>
+              <div class="card-id"><div class="name"><a href="https://www.yukimitsufuji.com/" target="_blank" rel="noopener">Yuki Mitsufuji</a></div><div class="aff">Sony AI · Sony Group</div></div>
+            </div>
+            <div class="card-divider"></div>
+            <p class="bio">Yuki Mitsufuji is a Distinguished Engineer at Sony Group Corporation and leads AI research at Sony AI, working at the intersection of creativity and artificial intelligence. He is also a Visiting Research Professor at New York University and an IEEE Senior Member. His research focuses on generative models and diffusion-based approaches for vision and audio. He has organized and delivered tutorials on diffusion models at international conferences such as ISMIR 2024, ICASSP 2025, and IJCNN 2025, and has given a series of lectures at the Tokyo Institute of Technology.</p>
+            <p class="links"><a href="https://www.yukimitsufuji.com/" target="_blank" rel="noopener">Website ↗</a></p>
+          </article>
+          <article class="card">
+            <div class="card-head">
+              <div class="avatar g3"><span class="mono-initials">SS</span><img src="assets/people/sahoo.png" alt="Portrait of Subham Sekhar Sahoo" loading="lazy" onerror="this.remove()"></div>
+              <div class="card-id"><div class="name"><a href="https://s-sahoo.com/" target="_blank" rel="noopener">Subham Sekhar Sahoo</a></div><div class="aff">MBZUAI · IFM</div></div>
+            </div>
+            <div class="card-divider"></div>
+            <p class="bio">Subham Sahoo is a Senior Research Scientist at the MBZUAI Institute of Foundation Models, where he leads a research team focused on diffusion language models (diffusion-LLMs). He holds a Ph.D. from Cornell University, where he conducted foundational work in this area. Most notably, he proposed the MDLM framework, which has played a pivotal role in shaping the field of discrete diffusion and has been adopted at industrial scale, such as ByteDance’s state-of-the-art diffusion-LLM and NVIDIA’s GenMol foundation model for drug discovery.</p>
+            <p class="links"><a href="https://s-sahoo.com/" target="_blank" rel="noopener">Website ↗</a><a href="https://scholar.google.com/citations?user=Z7DoDbAAAAAJ&amp;hl=en" target="_blank" rel="noopener">Google Scholar ↗</a></p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <hr class="rule" />
+
+    <!-- ===================== SCHEDULE ===================== -->
+    <section id="schedule" class="pad-y">
+      <div class="wrap">
+        <div data-reveal>
+          <p class="eyebrow"><span class="idx">02</span> Schedule</p>
+          <h2 class="h">Two parts, three <span class="it">live demos</span>.</h2>
+          <p class="lead" style="margin-top:22px">The tutorial starts at 9:00 AM AEDT on Monday, December 7, in the TikTok Ent Centre and runs in the order below. Per-session times will be posted closer to the event.</p>
+        </div>
+
+        <!-- Part I -->
+        <div class="sched" data-reveal style="margin-top:34px">
+          <div class="sched-head">
+            <div>
+              <span class="pno">Part I</span>
+              <h3>Continuous Diffusion</h3>
+              <p>This section develops the theoretical and empirical foundations of diffusion and flow-map models for fast sampling on continuous data.</p>
+            </div>
+            <span class="inst">Instructor<b>Chieh-Hsin (Jesse) Lai</b></span>
+          </div>
+          <div class="sched-row talk">
+            <span class="time">I · 01</span>
+            <span class="what">Continuous diffusion overview from three origins
+              <ul class="sub-list">
+                <li>Variational-based: VAE ➞ <a href="https://arxiv.org/abs/2006.11239" target="_blank" rel="noopener">DDPM</a></li>
+                <li>Score-based: Energy-based model ➞ <a href="https://arxiv.org/abs/2011.13456" target="_blank" rel="noopener">Score SDE</a></li>
+                <li>Flow-based: Normalizing flows ➞ <a href="https://arxiv.org/abs/2210.02747" target="_blank" rel="noopener">Flow matching</a> &amp; <a href="https://arxiv.org/abs/2209.03003" target="_blank" rel="noopener">Rectified flow</a></li>
+              </ul>
+            </span>
+            <span class="tag">Lecture</span>
+          </div>
+          <div class="sched-row talk">
+            <span class="time">I · 02</span>
+            <span class="what">Diffusion-motivated flow-map models as fast generators
+              <ul class="sub-list">
+                <li><a href="https://arxiv.org/abs/2303.01469" target="_blank" rel="noopener">Consistency Model (CM)</a></li>
+                <li><a href="https://arxiv.org/abs/2310.02279" target="_blank" rel="noopener">Consistency Trajectory Model (CTM)</a></li>
+                <li><a href="https://arxiv.org/abs/2505.13447" target="_blank" rel="noopener">MeanFlow (MF)</a></li>
+              </ul>
+            </span>
+            <span class="tag">Lecture</span>
+          </div>
+          <div class="sched-row talk">
+            <span class="time">I · 03</span>
+            <span class="what">Efficient flow-map training with <a href="https://arxiv.org/abs/2509.24526" target="_blank" rel="noopener">Consistency Mid-Training</a></span>
+            <span class="tag">Lecture</span>
+          </div>
+          <div class="sched-row oral">
+            <span class="time">I · 04</span>
+            <span class="what">Live Demo 1: Training a flow-map model</span>
+            <span class="tag">Live demo</span>
+          </div>
+        </div>
+
+        <!-- Interlude -->
+        <div class="sched" data-reveal style="margin-top:18px">
+          <div class="sched-row talk">
+            <span class="time">Interlude</span>
+            <span class="what">Audio-Visual Generation &amp; Protection of Creation
+              <span class="sm">Instructor: Yuki Mitsufuji. A brief look at AI content creation and protection, from diffusion memorization and attribution to audio-visual models such as <a href="https://github.com/hkchengrex/MMAudio" target="_blank" rel="noopener">MMAudio</a>, highlighting both creativity and the need for safeguards.</span>
+            </span>
+            <span class="tag">Lecture</span>
+          </div>
+          <div class="sched-row break"><span class="time">—</span><span class="what">Break</span><span class="tag">Break</span></div>
+        </div>
+
+        <!-- Part II -->
+        <div class="sched" data-reveal style="margin-top:18px">
+          <div class="sched-head">
+            <div>
+              <span class="pno">Part II</span>
+              <h3>Discrete Diffusion</h3>
+              <p>This section builds the theoretical and empirical foundation for diffusion when the data lives in discrete space.</p>
+            </div>
+            <span class="inst">Instructor<b>Subham Sekhar Sahoo</b></span>
+          </div>
+          <div class="sched-row talk">
+            <span class="time">II · 01</span>
+            <span class="what">Discrete diffusion overview
+              <ul class="sub-list">
+                <li>Uniform-state diffusion: forward / reverse process</li>
+                <li>Training + implementation</li>
+                <li>Samplers</li>
+              </ul>
+            </span>
+            <span class="tag">Lecture</span>
+          </div>
+          <div class="sched-row oral">
+            <span class="time">II · 02</span>
+            <span class="what">Live Demo 1: Image generation
+              <ul class="sub-list">
+                <li>Training a discrete diffusion model for image generation</li>
+                <li>Implement samplers: ancestral sampler, and Psi-sampler <a class="cite" href="#ref-2">[2]</a> for inference-time scaling</li>
+              </ul>
+            </span>
+            <span class="tag">Live demo</span>
+          </div>
+          <div class="sched-row talk">
+            <span class="time">II · 03</span>
+            <span class="what">Self-distillation to accelerate sampling
+              <ul class="sub-list">
+                <li>The discrete-space and continuous-space diffusion duality <a class="cite" href="#ref-1">[1]</a></li>
+                <li>Use the duality to design Discrete Consistency Distillation <a class="cite" href="#ref-1">[1]</a></li>
+                <li>Implementation</li>
+              </ul>
+            </span>
+            <span class="tag">Lecture</span>
+          </div>
+          <div class="sched-row oral">
+            <span class="time">II · 04</span>
+            <span class="what">Live Demo 2: Discrete Consistency Distillation
+              <ul class="sub-list">
+                <li>Distill a pre-trained discrete diffusion model for faster inference via Discrete Consistency Distillation</li>
+                <li>Implement the Greedy-Tail sampler <a class="cite" href="#ref-1">[1]</a> for few-step generation</li>
+              </ul>
+            </span>
+            <span class="tag">Live demo</span>
+          </div>
+        </div>
+        <p class="sched-legend">Session times to be announced · shown in program order.</p>
+      </div>
+    </section>
+
+    <!-- ===================== MATERIALS ===================== -->
+    <section id="materials" class="dark pad-y">
+      <div class="wrap">
+        <div data-reveal>
+          <p class="eyebrow"><span class="idx">03</span> Materials</p>
+          <h2 class="h">Book, slides &amp; <span class="it">notebooks</span>.</h2>
+          <p class="lead" style="margin-top:22px">Everything below is from the CVPR 2026 edition of this tutorial. NeurIPS 2026 slides and a recording will be added here.</p>
+        </div>
+        <div class="mat-grid" data-reveal>
+          <div class="mat">
+            <h3>Book &amp; references</h3>
+            <h4>Continuous diffusion</h4>
+            <ul>
+              <li><a href="https://the-principles-of-diffusion-models.github.io/" target="_blank" rel="noopener">The Principles of Diffusion Models <span aria-hidden="true">↗</span></a><span class="by">Chieh-Hsin Lai, Yang Song, Dongjun Kim, Yuki Mitsufuji, Stefano Ermon</span></li>
+            </ul>
+            <h4>Discrete diffusion</h4>
+            <ul>
+              <li><a href="https://s-sahoo.com/mdlm/" target="_blank" rel="noopener">Simple and Effective Masked Diffusion Models <span aria-hidden="true">↗</span></a></li>
+              <li id="ref-1"><a href="https://s-sahoo.com/duo/" target="_blank" rel="noopener">[1] The Diffusion Duality <span aria-hidden="true">↗</span></a><span class="by">Subham Sekhar Sahoo, Justin Deschenaux, Aaron Gokaslan, Guanghan Wang, Justin Chiu, Volodymyr Kuleshov · ICML 2025</span></li>
+              <li id="ref-2"><a href="https://s-sahoo.com/duo-ch2" target="_blank" rel="noopener">[2] The Diffusion Duality, Chapter II: Psi-Samplers and Efficient Curriculum <span aria-hidden="true">↗</span></a><span class="by">Justin Deschenaux, Caglar Gulcehre, Subham Sekhar Sahoo · ICLR 2026</span></li>
+            </ul>
+          </div>
+          <div class="mat">
+            <h3>Colab notebooks</h3>
+            <h4>Continuous diffusion</h4>
+            <ul>
+              <li><a href="https://colab.research.google.com/github/the-principles-of-diffusion-models/codes-demos/blob/main/Part-B/diffusion_tutorial.ipynb" target="_blank" rel="noopener">Part 1: Fundamentals of continuous diffusion <span aria-hidden="true">↗</span></a></li>
+              <li><a href="https://colab.research.google.com/github/the-principles-of-diffusion-models/codes-demos/blob/main/Part-D/flow_map_tutorial.ipynb" target="_blank" rel="noopener">Part 2: Consistency Model, Consistency Trajectory Model, MeanFlow <span aria-hidden="true">↗</span></a></li>
+            </ul>
+            <h4>Discrete diffusion</h4>
+            <ul>
+              <li><a href="https://drive.google.com/file/d/1-RehWZxGdLRMTcb8PUIs3PbiZv5w__vO/view?usp=sharing" target="_blank" rel="noopener">Part 1: Fundamentals of uniform-state diffusion <span aria-hidden="true">↗</span></a></li>
+              <li><a href="https://colab.research.google.com/drive/1YGN2U8rz68KCv6AE_V3TPULgd18MkBv-?usp=sharing" target="_blank" rel="noopener">Part 2: Inference-time scaling with Psi-samplers <span aria-hidden="true">↗</span></a></li>
+              <li><a href="https://colab.research.google.com/drive/1K5upe_hDNkKEEbCRRk8QVxpkZPTYWRee?usp=sharing" target="_blank" rel="noopener">Part 3: Few-step generation <span aria-hidden="true">↗</span></a></li>
+            </ul>
+          </div>
+          <div class="mat">
+            <h3>Slides &amp; recording</h3>
+            <h4>Slides</h4>
+            <ul>
+              <li><a href="https://drive.google.com/file/d/1qvj99WY-gzDD54TOaNCkW2eTYal4aSSi/view?usp=sharing" target="_blank" rel="noopener">Continuous diffusion slides <span aria-hidden="true">↗</span></a></li>
+              <li>Discrete diffusion slides <span class="tbd" title="To be posted">coming soon</span></li>
+            </ul>
+            <h4>Recording</h4>
+            <ul><li><span class="tbd" title="To be posted after the tutorial">To be posted</span></li></ul>
+            <h4>How to cite</h4>
+            <ul><li><span class="tbd" title="To be posted">To be posted</span></li></ul>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer>
+    <div class="wrap">
+      <p class="foot-links">
+        <a href="mailto:chieh-hsin.lai@sony.com,subham.sahoo@mbzuai.ac.ae">Email organizers</a>
+        <span aria-hidden="true">·</span>
+        <a href="https://sites.google.com/view/cvpr26-principles-of-diffusion/home" target="_blank" rel="noopener">CVPR 2026 edition ↗</a>
+      </p>
+      <p class="foot-bottom">© 2026 The Principles of Diffusion Models Tutorial · Website built off of the <a href="https://github.com/BeNTo-NeurIPS/bento-neurips.github.io" target="_blank" rel="noopener">BeNTo workshop site ↗</a></p>
+    </div>
+  </footer>
+
+  <script>
+    (function(){
+      "use strict";
+      var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      /* ---------- Nav scroll state ---------- */
+      var nav = document.getElementById('nav');
+      var onScroll = function(){
+        if(window.scrollY > 40){ nav.classList.add('scrolled'); }
+        else{ nav.classList.remove('scrolled'); }
+      };
+      onScroll();
+      window.addEventListener('scroll', onScroll, {passive:true});
+
+      /* ---------- Mobile drawer ---------- */
+      var toggle = document.getElementById('navToggle');
+      var links = document.getElementById('navLinks');
+      var backdrop = document.getElementById('drawerBackdrop');
+      function setDrawer(open){
+        links.classList.toggle('open', open);
+        backdrop.classList.toggle('open', open);
+        backdrop.hidden = !open;
+        toggle.setAttribute('aria-expanded', open ? 'true':'false');
+        toggle.textContent = open ? '✕' : '☰';
+        document.body.style.overflow = open ? 'hidden' : '';
+      }
+      toggle.addEventListener('click', function(){ setDrawer(!links.classList.contains('open')); });
+      backdrop.addEventListener('click', function(){ setDrawer(false); });
+      links.addEventListener('click', function(e){ if(e.target.tagName === 'A'){ setDrawer(false); } });
+      window.addEventListener('keydown', function(e){ if(e.key === 'Escape'){ setDrawer(false); } });
+
+      /* ---------- Reveal on scroll ---------- */
+      var revealEls = document.querySelectorAll('[data-reveal]');
+      if(reduceMotion || !('IntersectionObserver' in window)){
+        revealEls.forEach(function(el){ el.classList.add('in'); });
+      } else {
+        var ro = new IntersectionObserver(function(entries){
+          entries.forEach(function(en){
+            if(en.isIntersecting){ en.target.classList.add('in'); ro.unobserve(en.target); }
+          });
+        }, {threshold:0.12, rootMargin:'0px 0px -8% 0px'});
+        revealEls.forEach(function(el){ ro.observe(el); });
+      }
+
+      /* ---------- Active nav link ---------- */
+      var navAnchors = Array.prototype.slice.call(document.querySelectorAll('.nav-links a[href^="#"]'));
+      var sectionMap = {};
+      navAnchors.forEach(function(a){
+        var id = a.getAttribute('href').slice(1);
+        var sec = document.getElementById(id);
+        if(sec){ sectionMap[id] = a; }
+      });
+      if('IntersectionObserver' in window){
+        var so = new IntersectionObserver(function(entries){
+          entries.forEach(function(en){
+            if(en.isIntersecting){
+              navAnchors.forEach(function(a){ a.classList.remove('active'); });
+              var a = sectionMap[en.target.id];
+              if(a){ a.classList.add('active'); }
+            }
+          });
+        }, {rootMargin:'-45% 0px -50% 0px'});
+        Object.keys(sectionMap).forEach(function(id){ so.observe(document.getElementById(id)); });
+      }
+
+      /* ---------- Hero denoising canvas ---------- */
+      var canvas = document.getElementById('hero-canvas');
+      if(canvas && canvas.getContext){
+        var ctx = canvas.getContext('2d');
+        var W=0,H=0,dpr=1,cell=40,cols=0,rows=0,cells=[];
+        // resolved-cell colors (on dark ink)
+        var COLORS = ['#5b53ff','#6f77ff','#12b3a6','#2b3663','#3a4680'];
+        function rrect(x,y,w,h,r){
+          ctx.beginPath();
+          ctx.moveTo(x+r,y);
+          ctx.arcTo(x+w,y,x+w,y+h,r);
+          ctx.arcTo(x+w,y+h,x,y+h,r);
+          ctx.arcTo(x,y+h,x,y,r);
+          ctx.arcTo(x,y,x+w,y,r);
+          ctx.closePath();
+        }
+        function build(){
+          var rect = canvas.getBoundingClientRect();
+          W = rect.width; H = rect.height;
+          if(W===0||H===0) return;
+          dpr = Math.min(window.devicePixelRatio||1, 2);
+          canvas.width = Math.floor(W*dpr);
+          canvas.height = Math.floor(H*dpr);
+          ctx.setTransform(dpr,0,0,dpr,0,0);
+          cell = Math.max(30, Math.round(Math.min(W,H)/13));
+          cols = Math.ceil(W/cell)+1;
+          rows = Math.ceil(H/cell)+1;
+          cells = [];
+          for(var y=0;y<rows;y++){
+            for(var x=0;x<cols;x++){
+              // smooth field -> intentional-looking color clusters
+              var f = Math.sin(x*0.55) + Math.cos(y*0.6 + x*0.2);
+              var ci;
+              if(f>1.1) ci=0; else if(f>0.4) ci=1; else if(f<-1.1) ci=2; else if(f<-0.3) ci=3; else ci=4;
+              // reveal order: diagonal-ish base + randomness => parallel, non-causal feel
+              var base = (x/cols)*0.35 + (y/rows)*0.25;
+              cells.push({
+                x:x, y:y, ci:ci,
+                order: Math.max(0, Math.min(1, base + (Math.sin(x*12.9898 + y*78.233)*43758.5453 % 1) * 0.55 )),
+                seed: (x*7 + y*13) % 97
+              });
+            }
+          }
+        }
+        function smooth(t){ t = t<0?0:(t>1?1:t); return t*t*(3-2*t); }
+        var PERIOD = 9200; // ms
+        var last = 0;
+        var startTime = null;
+        function frame(ts){
+          if(startTime===null) startTime = ts;
+          // throttle ~33fps
+          if(ts - last < 30){ rafId = requestAnimationFrame(frame); return; }
+          last = ts;
+          draw((ts - startTime));
+          rafId = requestAnimationFrame(frame);
+        }
+        function draw(elapsed){
+          if(W===0||H===0){ build(); if(W===0) return; }
+          ctx.clearRect(0,0,W,H);
+          var p = (elapsed % PERIOD) / PERIOD; // 0..1
+          var size = cell * 0.68;
+          var pad = (cell - size)/2;
+          for(var i=0;i<cells.length;i++){
+            var c = cells[i];
+            var prog;
+            if(p < 0.60){                    // parallel reveal
+              prog = smooth((p/0.60 - c.order)/0.16);
+            } else if(p < 0.82){             // hold resolved
+              prog = 1;
+            } else {                          // re-noise (reverse order)
+              var rp = (p-0.82)/0.18;
+              prog = 1 - smooth((rp - (1-c.order))/0.16);
+            }
+            var px = c.x*cell + pad;
+            var py = c.y*cell + pad;
+            // resolved block
+            if(prog > 0.02){
+              ctx.globalAlpha = prog * 0.9;
+              ctx.fillStyle = COLORS[c.ci];
+              rrect(px, py, size, size, size*0.22);
+              ctx.fill();
+            }
+            // noise (masked token): flickering dots while unresolved
+            if(prog < 0.98){
+              var noise = (1-prog);
+              ctx.globalAlpha = noise * 0.5;
+              ctx.fillStyle = '#7c84b8';
+              var t = Math.floor(elapsed/90) + c.seed;
+              for(var d=0; d<3; d++){
+                var rx = ((Math.sin((t+d)*12.9 + c.seed)*43758.5)%1+1)%1;
+                var ry = ((Math.sin((t+d)*78.2 + c.seed*3)*43758.5)%1+1)%1;
+                var ds = size*0.13;
+                ctx.fillRect(px + rx*(size-ds), py + ry*(size-ds), ds, ds);
+              }
+            }
+          }
+          ctx.globalAlpha = 1;
+        }
+        function drawStatic(){
+          // tasteful partially-denoised frame for reduced-motion
+          if(W===0||H===0){ build(); if(W===0) return; }
+          ctx.clearRect(0,0,W,H);
+          var size = cell*0.68, pad=(cell-size)/2;
+          for(var i=0;i<cells.length;i++){
+            var c = cells[i];
+            var prog = smooth((0.55 - c.order)/0.3);
+            var px=c.x*cell+pad, py=c.y*cell+pad;
+            if(prog>0.02){
+              ctx.globalAlpha = prog*0.9; ctx.fillStyle=COLORS[c.ci];
+              rrect(px,py,size,size,size*0.22); ctx.fill();
+            }
+            if(prog<0.9){
+              ctx.globalAlpha=(1-prog)*0.4; ctx.fillStyle='#7c84b8';
+              ctx.fillRect(px+size*0.3, py+size*0.3, size*0.14, size*0.14);
+            }
+          }
+          ctx.globalAlpha=1;
+        }
+
+        var rafId=null, running=false;
+        function start(){ if(running||reduceMotion) return; running=true; last=0; startTime=null; rafId=requestAnimationFrame(frame); }
+        function stop(){ running=false; if(rafId){ cancelAnimationFrame(rafId); rafId=null; } }
+
+        build();
+        if(reduceMotion){ drawStatic(); }
+        else { start(); }
+
+        // pause when tab hidden
+        document.addEventListener('visibilitychange', function(){
+          if(document.hidden){ stop(); }
+          else if(!reduceMotion){ start(); }
+        });
+        // debounced resize
+        var rt=null;
+        window.addEventListener('resize', function(){
+          if(rt) clearTimeout(rt);
+          rt = setTimeout(function(){ build(); if(reduceMotion){ drawStatic(); } }, 180);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
