@@ -350,6 +350,44 @@
       .hero-actions{width:100%}
     }
 
+    /* ===================== All-dark page: nav, cards, schedule ===================== */
+    main section.dark + section.dark{border-top:1px solid rgba(255,255,255,.08)}
+    header.nav.scrolled{background:rgba(11,16,32,.82); border-bottom-color:rgba(255,255,255,.1); box-shadow:0 1px 20px -12px rgba(0,0,0,.8)}
+    header.nav.scrolled .brand{color:var(--paper)}
+    header.nav.scrolled .brand .sub{color:var(--accent-lt)}
+    header.nav.scrolled .nav-links a{color:rgba(245,242,236,.82)}
+    header.nav.scrolled .nav-links a:hover, header.nav.scrolled .nav-links a.active{color:var(--accent-lt); background:rgba(160,155,255,.1)}
+    header.nav.scrolled .nav-links a.cta, header.nav.scrolled .nav-links a.cta:hover{color:#fff}
+    header.nav.scrolled .nav-toggle{color:var(--paper); border-color:rgba(245,242,236,.3)}
+
+    section.dark .card{background:rgba(255,255,255,.03); border-color:rgba(255,255,255,.14)}
+    section.dark .card:hover{border-color:var(--accent-lt); box-shadow:0 12px 34px -18px rgba(0,0,0,.7)}
+    section.dark .card-id .name{color:#fff}
+    section.dark .card .name a:hover{color:var(--accent-lt); border-bottom-color:var(--accent-lt)}
+    section.dark .card-id .aff{color:#8890b0}
+    section.dark .card .bio{color:#aab0c6}
+    section.dark .card-divider{background:rgba(255,255,255,.1)}
+
+    section.dark .sched{background:rgba(255,255,255,.03); border-color:rgba(255,255,255,.14)}
+    section.dark .sched-head{background:rgba(255,255,255,.03); border-bottom-color:rgba(255,255,255,.1)}
+    section.dark .sched-head .pno{color:var(--accent-lt)}
+    section.dark .sched-head h3, section.dark .sched-head .inst b{color:#fff}
+    section.dark .sched-head p{color:#aab0c6}
+    section.dark .sched-head .inst{color:#8890b0}
+    section.dark .sched-row{border-bottom-color:rgba(255,255,255,.08)}
+    section.dark .sched-row:hover{background:rgba(255,255,255,.04)}
+    section.dark .sched-row .time{color:var(--accent-lt)}
+    section.dark .sched-row .what{color:#eef0f8}
+    section.dark .sched-row .what .sm, section.dark .sub-list{color:#aab0c6}
+    section.dark .sub-list li::before{background:var(--accent-lt)}
+    section.dark .sched-row .tag{color:#a7adc4; border-color:rgba(255,255,255,.2)}
+    section.dark .sched-row.oral .tag{color:var(--accent-2-lt); border-color:rgba(79,214,203,.4)}
+    section.dark .sched-row.break, section.dark .sched-row.break:hover{background:rgba(255,255,255,.05)}
+    section.dark .sched-row.break .what, section.dark .sched-row.break .time{color:#a7adc4}
+    section.dark .sched-legend{color:#8890b0}
+    section.dark .sched a, section.dark .card .links a{color:var(--accent-lt); text-decoration-color:rgba(160,155,255,.4)}
+    section.dark .sched a:hover, section.dark .card .links a:hover{color:#fff; text-decoration-color:#fff}
+
     /* ===================== Reveal animation ===================== */
     [data-reveal]{opacity:0; transform:translateY(22px); transition:opacity .7s cubic-bezier(.2,.7,.2,1), transform .7s cubic-bezier(.2,.7,.2,1)}
     [data-reveal].in{opacity:1; transform:none}
@@ -426,7 +464,7 @@
     </section>
 
     <!-- ===================== SPEAKERS ===================== -->
-    <section id="speakers" class="pad-y">
+    <section id="speakers" class="dark pad-y">
       <div class="wrap">
         <div data-reveal>
           <p class="eyebrow"><span class="idx">01</span> Speakers</p>
@@ -464,10 +502,8 @@
       </div>
     </section>
 
-    <hr class="rule" />
-
     <!-- ===================== SCHEDULE ===================== -->
-    <section id="schedule" class="pad-y">
+    <section id="schedule" class="dark pad-y">
       <div class="wrap">
         <div data-reveal>
           <p class="eyebrow"><span class="idx">02</span> Schedule</p>
