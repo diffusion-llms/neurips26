@@ -292,6 +292,8 @@
     .bio-toggle summary::after{content:"+"; font-size:15px; line-height:1; transition:transform .2s ease}
     .bio-toggle[open] summary::after{transform:rotate(45deg)}
     .bio-toggle .bio{margin-top:12px}
+    .bio a.thesis{color:var(--accent); text-decoration:none}
+    .bio a.thesis:hover{text-decoration:underline}
     .organizers{margin-top:48px; text-align:center}
     .organizers h3{font-family:var(--ff-mono); font-size:12px; font-weight:500; letter-spacing:.12em; text-transform:uppercase; margin:0 0 10px}
     .organizers p{margin:0}
@@ -367,6 +369,7 @@
     section.dark .card .name a:hover{color:var(--accent-lt); border-bottom-color:var(--accent-lt)}
     section.dark .card-id .aff{color:#8890b0}
     section.dark .card .bio{color:#aab0c6}
+    section.dark .bio a.thesis{color:var(--accent-lt)}
     section.dark .card-divider{background:rgba(255,255,255,.1)}
     section.dark .bio-toggle{border-top-color:rgba(255,255,255,.1)}
     section.dark .bio-toggle summary{color:var(--accent-lt)}
@@ -483,7 +486,15 @@
             <div class="card-id"><div class="name"><a href="https://chiehhsinjesselai.github.io/ChiehHsinLai/" target="_blank" rel="noopener">Chieh-Hsin (Jesse) Lai</a></div><div class="aff">Sony AI</div></div>
             <details class="bio-toggle">
               <summary>Bio</summary>
-              <p class="bio">Chieh-Hsin (Jesse) Lai received his Ph.D. in Mathematics from the University of Minnesota in 2021. He is currently a Staff Research Scientist at Sony AI and a Visiting Assistant Professor in the Department of Applied Mathematics at National Yang Ming Chiao Tung University (Taiwan). His research focuses on deep generative modeling (with an emphasis on diffusion models) and AI for science. He has organized and delivered tutorials on generative AI at ISMIR 2024, ICASSP 2025, and IJCNN 2025. Recently, he led and authored a book, <i>The Principles of Diffusion Models</i>, which provides a systematic treatment of the foundations of diffusion models.</p>
+              <p class="bio">Chieh-Hsin (Jesse) Lai received his Ph.D. in Mathematics from the University of Minnesota in 2021. 
+                He is currently a Staff Research Scientist at Sony AI and a 
+                Visiting Assistant Professor in the Department of Applied 
+                Mathematics at National Yang Ming Chiao Tung University (Taiwan). 
+                His research focuses on deep generative modeling 
+                (with an emphasis on diffusion models) and AI for science. 
+                Recently, he led and authored a book, 
+                <i>The Principles of Diffusion Models</i>, which provides 
+                a systematic treatment of the foundations of diffusion models.</p>
             </details>
             <p class="links"><a href="https://chiehhsinjesselai.github.io/ChiehHsinLai/" target="_blank" rel="noopener">Website ↗</a><a href="https://scholar.google.co.jp/citations?user=KDnKGu8AAAAJ&amp;hl=en" target="_blank" rel="noopener">Google Scholar ↗</a></p>
           </article>
@@ -492,7 +503,12 @@
             <div class="card-id"><div class="name"><a href="https://s-sahoo.com/" target="_blank" rel="noopener">Subham Sekhar Sahoo</a></div><div class="aff">MBZUAI · IFM</div></div>
             <details class="bio-toggle">
               <summary>Bio</summary>
-              <p class="bio">Subham Sahoo is a Senior Research Scientist at the MBZUAI Institute of Foundation Models, where he leads a research team focused on diffusion language models (diffusion-LLMs). He holds a Ph.D. from Cornell University, where he conducted foundational work in this area. Most notably, he proposed the MDLM framework, which has played a pivotal role in shaping the field of discrete diffusion and has been adopted at industrial scale, such as ByteDance’s state-of-the-art diffusion-LLM and NVIDIA’s GenMol foundation model for drug discovery.</p>
+              <p class="bio">Subham Sahoo is a Senior Research Scientist at the MBZUAI Institute of Foundation Models (IFM), 
+                where he leads the Diffusion LLM team. His research laid key 
+                foundations for the recent success of diffusion-LLMs. 
+                He received his Ph.D. from Cornell Tech with the thesis 
+                <a class="thesis" href="https://s-sahoo.github.io/phd-thesis/" target="_blank" rel="noopener"><em>Foundations of Diffusion Language Models</em></a>.
+              </p>
             </details>
             <p class="links"><a href="https://s-sahoo.com/" target="_blank" rel="noopener">Website ↗</a><a href="https://scholar.google.com/citations?user=Z7DoDbAAAAAJ&amp;hl=en" target="_blank" rel="noopener">Google Scholar ↗</a></p>
           </article>
