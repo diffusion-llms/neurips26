@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-labelledby="titleD descD">
+  <!-- dark background -->
+  <rect x="8" y="8" width="184" height="184" rx="28" fill="url(#grad-bg)"/>
+
+  <!-- gradients -->
+  <defs>
+    <!-- darker indigo gradient background -->
+    <linearGradient id="grad-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1e1b4b"/>
+      <stop offset="100%" stop-color="#312e81"/>
+    </linearGradient>
+
+    <!-- bright D gradient -->
+    <linearGradient id="grad-D" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#c4b5fd"/>
+      <stop offset="100%" stop-color="#a5b4fc"/>
+    </linearGradient>
+  </defs>
+
+  <!-- D made of fewer, larger squares -->
+  <g transform="translate(53,50)">
+    <!-- left column -->
+    <rect x="0" y="0" width="28" height="28" rx="5" fill="url(#grad-D)"/>
+    <rect x="0" y="34" width="28" height="28" rx="5" fill="url(#grad-D)"/>
+    <rect x="0" y="68" width="28" height="28" rx="5" fill="url(#grad-D)"/>
+
+    <!-- middle column -->
+    <rect x="34" y="0" width="28" height="28" rx="5" fill="#c4b5fd"/>
+    <rect x="34" y="34" width="28" height="28" rx="5" fill="#a78bfa"/>
+    <rect x="34" y="68" width="28" height="28" rx="5" fill="#8b5cf6"/>
+
+    <!-- right column (curve of D) -->
+    <rect x="68" y="34" width="28" height="28" rx="5" fill="#6366f1" opacity="0.9"/>
+    <rect x="68" y="68" width="28" height="28" rx="5" fill="#4f46e5" opacity="0.75"/>
+  </g>
+</svg>

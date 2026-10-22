@@ -5,17 +5,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>The Principles of Diffusion Models: Toward Fast and Scalable Diffusion LLMs · NeurIPS 2026 Tutorial</title>
-  <meta name="description" content="A NeurIPS 2026 tutorial on fast diffusion-based generation across continuous and discrete data, with live demos attendees can adapt for their own research." />
+  <meta name="description" content="A  NeurIPS 2026 tutorial on designing frontier diffusion-LLMs at scale, featuring live demos that attendees can adapt for their own research." />
   <meta name="author" content="NeurIPS 2026 Tutorial Organizers" />
   <meta name="theme-color" content="#0b1020" />
 
   <!-- Open Graph / Twitter -->
   <meta property="og:type" content="website" />
   <meta property="og:title" content="The Principles of Diffusion Models: Toward Fast and Scalable Diffusion LLMs — NeurIPS 2026 Tutorial" />
-  <meta property="og:description" content="A NeurIPS 2026 tutorial on fast diffusion-based generation across continuous and discrete data, with live demos attendees can adapt for their own research." />
+  <meta property="og:description" content="A NeurIPS 2026 tutorial on designing frontier diffusion-LLMs at scale, featuring live demos that attendees can adapt for their own research." />
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="The Principles of Diffusion Models: Toward Fast and Scalable Diffusion LLMs — NeurIPS 2026 Tutorial" />
-  <meta name="twitter:description" content="A NeurIPS 2026 tutorial on fast diffusion-based generation across continuous and discrete data, with live demos attendees can adapt for their own research." />
+  <meta name="twitter:description" content="A NeurIPS 2026 tutorial on designing frontier diffusion-LLMs at scale, featuring live demos that attendees can adapt for their own research." />
 
   <!-- Favicon: inline SVG denoising-grid mark (no external file needed) -->
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230b1020'/%3E%3Cg fill='%235b53ff'%3E%3Crect x='5' y='5' width='6' height='6' rx='1.4' opacity='.35'/%3E%3Crect x='13' y='5' width='6' height='6' rx='1.4' opacity='.9'/%3E%3Crect x='21' y='5' width='6' height='6' rx='1.4' opacity='.5'/%3E%3C/g%3E%3Cg fill='%2312b3a6'%3E%3Crect x='5' y='13' width='6' height='6' rx='1.4' opacity='.85'/%3E%3Crect x='13' y='13' width='6' height='6' rx='1.4' opacity='.45'/%3E%3Crect x='21' y='13' width='6' height='6' rx='1.4' opacity='.95'/%3E%3C/g%3E%3Cg fill='%235b53ff'%3E%3Crect x='5' y='21' width='6' height='6' rx='1.4' opacity='.55'/%3E%3Crect x='13' y='21' width='6' height='6' rx='1.4' opacity='.95'/%3E%3Crect x='21' y='21' width='6' height='6' rx='1.4' opacity='.3'/%3E%3C/g%3E%3C/svg%3E" />
@@ -281,6 +281,21 @@
     .card .email{font-family:var(--ff-mono); font-size:12.5px; margin-top:14px; color:var(--accent); text-decoration:none; word-break:break-all; border-bottom:1px solid transparent; width:max-content; transition:border-color .2s}
     .card .email:hover{border-bottom-color:var(--accent)}
     .card-divider{height:1px; background:var(--line-soft); margin:0 0 14px}
+    .photo{position:relative; width:100%; aspect-ratio:1/1; border-radius:calc(var(--r) - 6px); overflow:hidden; margin-bottom:18px; background:linear-gradient(135deg,var(--accent),var(--accent-2)); display:flex; align-items:center; justify-content:center}
+    .photo.g2{background:linear-gradient(135deg,var(--accent-2),#0e8f86)}
+    .photo.g3{background:linear-gradient(135deg,#7a72ff,#5b53ff)}
+    .photo .mono-initials{font-family:var(--ff-mono); font-size:48px; font-weight:600; color:#fff}
+    .photo img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover}
+    .bio-toggle{margin-top:14px; border-top:1px solid var(--line-soft); padding-top:12px}
+    .bio-toggle summary{cursor:pointer; list-style:none; font-family:var(--ff-mono); font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--accent); display:flex; align-items:center; gap:8px; width:max-content}
+    .bio-toggle summary::-webkit-details-marker{display:none}
+    .bio-toggle summary::after{content:"+"; font-size:15px; line-height:1; transition:transform .2s ease}
+    .bio-toggle[open] summary::after{transform:rotate(45deg)}
+    .bio-toggle .bio{margin-top:12px}
+    .organizers{margin-top:48px; text-align:center}
+    .organizers h3{font-family:var(--ff-mono); font-size:12px; font-weight:500; letter-spacing:.12em; text-transform:uppercase; margin:0 0 10px}
+    .organizers p{margin:0}
+    .organizers .aff{color:var(--text-soft)}
 
 
     /* ===================== Footer ===================== */
@@ -315,21 +330,7 @@
 
     /* ===================== People extras ===================== */
     .card .links{display:flex; flex-wrap:wrap; gap:6px 16px; margin:auto 0 0; padding-top:16px; font-family:var(--ff-mono); font-size:12.5px}
-
-    /* ===================== Materials (dark) ===================== */
-    .mat-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:22px; margin-top:40px}
-    .mat{border:1px solid rgba(255,255,255,.14); border-radius:var(--r); background:rgba(255,255,255,.03); padding:26px 26px 28px}
-    .mat h3{font-size:22px; color:#fff; letter-spacing:-.01em; padding-bottom:16px; border-bottom:1px solid rgba(255,255,255,.1)}
-    .mat h4{font-family:var(--ff-mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#8890b0; font-weight:500; margin:22px 0 10px}
-    .mat ul{list-style:none; margin:0; padding:0; display:grid; gap:12px}
-    .mat li{font-size:16.5px; line-height:1.4; color:#c6cbde; scroll-margin-top:96px}
-    .mat li a{color:var(--accent-lt); text-decoration:underline; text-underline-offset:3px; text-decoration-thickness:1px; text-decoration-color:rgba(160,155,255,.4); transition:color .2s, text-decoration-color .2s}
-    .mat li a:hover{color:#fff; text-decoration-color:#fff}
-    .mat li .by{display:block; font-family:var(--ff-mono); font-size:11.5px; letter-spacing:.01em; color:#8890b0; margin-top:5px; line-height:1.5}
-    .mat li:target{outline:1px solid var(--accent-lt); outline-offset:8px; border-radius:6px}
-
     section[id]{scroll-margin-top:60px}
-    @media (max-width:900px){ .mat-grid{grid-template-columns:1fr} }
 
     /* Centered hero; title sized so each of its two lines fits on one row */
     .hero-inner{align-items:center; text-align:center; max-width:1400px}
@@ -367,11 +368,17 @@
     section.dark .card-id .aff{color:#8890b0}
     section.dark .card .bio{color:#aab0c6}
     section.dark .card-divider{background:rgba(255,255,255,.1)}
+    section.dark .bio-toggle{border-top-color:rgba(255,255,255,.1)}
+    section.dark .bio-toggle summary{color:var(--accent-lt)}
+    section.dark .organizers h3{color:var(--accent-lt)}
+    section.dark .organizers p{color:#eef0f8}
+    section.dark .organizers .aff{color:#8890b0}
 
     section.dark .sched{background:rgba(255,255,255,.03); border-color:rgba(255,255,255,.14)}
     section.dark .sched-head{background:rgba(255,255,255,.03); border-bottom-color:rgba(255,255,255,.1)}
     section.dark .sched-head .pno{color:var(--accent-lt)}
     section.dark .sched-head h3, section.dark .sched-head .inst b{color:#fff}
+    .sched-head:last-child{border-bottom:0}
     section.dark .sched-head p{color:#aab0c6}
     section.dark .sched-head .inst{color:#8890b0}
     section.dark .sched-row{border-bottom-color:rgba(255,255,255,.08)}
@@ -381,6 +388,8 @@
     section.dark .sched-row .what .sm, section.dark .sub-list{color:#aab0c6}
     section.dark .sub-list li::before{background:var(--accent-lt)}
     section.dark .sched-row .tag{color:#a7adc4; border-color:rgba(255,255,255,.2)}
+    .sched-row a.tag{text-decoration:none; transition:border-color .18s ease, color .18s ease}
+    section.dark .sched-row a.tag:hover{color:#fff; border-color:rgba(255,255,255,.5)}
     section.dark .sched-row.oral .tag{color:var(--accent-2-lt); border-color:rgba(79,214,203,.4)}
     section.dark .sched-row.break, section.dark .sched-row.break:hover{background:rgba(255,255,255,.05)}
     section.dark .sched-row.break .what, section.dark .sched-row.break .time{color:#a7adc4}
@@ -426,14 +435,13 @@
   <header class="nav" id="nav">
     <div class="nav-inner">
       <a class="brand" href="#home" aria-label="The Principles of Diffusion Models, a NeurIPS 2026 tutorial — home">
-        <svg class="mark" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="6" fill="#5b53ff"/><g fill="#fff"><rect x="5" y="5" width="6" height="6" rx="1.4" opacity=".4"/><rect x="13" y="5" width="6" height="6" rx="1.4" opacity=".95"/><rect x="21" y="5" width="6" height="6" rx="1.4" opacity=".55"/><rect x="5" y="13" width="6" height="6" rx="1.4" opacity=".9"/><rect x="13" y="13" width="6" height="6" rx="1.4" opacity=".45"/><rect x="21" y="13" width="6" height="6" rx="1.4" opacity=".95"/><rect x="5" y="21" width="6" height="6" rx="1.4" opacity=".55"/><rect x="13" y="21" width="6" height="6" rx="1.4" opacity=".95"/><rect x="21" y="21" width="6" height="6" rx="1.4" opacity=".35"/></g></svg>
+        <img class="mark" src="assets/images/logo.svg" alt="" aria-hidden="true" />
         <span><b>Principles of Diffusion<span class="full">: Fast &amp; Scalable Diffusion LLMs</span></b><br><span class="sub">NeurIPS 2026 Tutorial</span></span>
       </a>
       <button class="nav-toggle" id="navToggle" aria-label="Open navigation menu" aria-expanded="false" aria-controls="navLinks">☰</button>
       <ul class="nav-links" id="navLinks">
         <li><a href="#speakers">Speakers</a></li>
         <li><a href="#schedule">Schedule</a></li>
-        <li><a href="#materials">Materials</a></li>
         <li><a class="cta" href="mailto:chieh-hsin.lai@sony.com,subham.sahoo@mbzuai.ac.ae">Contact</a></li>
       </ul>
     </div>
@@ -448,7 +456,7 @@
       <div class="hero-inner">
         <p class="kicker"><span class="dot" aria-hidden="true"></span> A NeurIPS 2026 Tutorial · Sydney, Australia</p>
         <h1><span class="ln">The Principles of Diffusion Models:</span> <span class="ln">Toward <span class="grad">Fast and Scalable</span> Diffusion LLMs</span></h1>
-        <p class="sub">A concise, hands-on tutorial on fast diffusion-based generation across continuous and discrete data, with live demos you can adapt for your own research.</p>
+        <p class="sub">A NeurIPS 2026 tutorial on designing frontier diffusion-LLMs at scale, featuring live demos that attendees can adapt for their own research.</p>
         <div class="chips">
           <div class="chip accent"><span class="k">Date</span><span class="v">Mon, Dec 7, 2026</span></div>
           <div class="chip"><span class="k">Time</span><span class="v">9:00 AM AEDT</span></div>
@@ -457,7 +465,6 @@
         </div>
         <div class="hero-actions">
           <a class="btn btn-primary" href="#schedule">View the schedule <span class="arr" aria-hidden="true">↓</span></a>
-          <a class="btn btn-ghost" href="#materials">Slides &amp; notebooks</a>
         </div>
       </div>
       <div class="scroll-hint" aria-hidden="true"><span>Scroll</span><span class="line"></span></div>
@@ -472,32 +479,36 @@
         </div>
         <div class="people" data-reveal style="margin-top:38px">
           <article class="card">
-            <div class="card-head">
-              <div class="avatar g1"><span class="mono-initials">CL</span><img src="assets/people/lai.jpg" alt="Portrait of Chieh-Hsin (Jesse) Lai" loading="lazy" onerror="this.remove()"></div>
-              <div class="card-id"><div class="name"><a href="https://chiehhsinjesselai.github.io/ChiehHsinLai/" target="_blank" rel="noopener">Chieh-Hsin (Jesse) Lai</a></div><div class="aff">Sony AI</div></div>
-            </div>
-            <div class="card-divider"></div>
-            <p class="bio">Chieh-Hsin (Jesse) Lai received his Ph.D. in Mathematics from the University of Minnesota in 2021. He is currently a Staff Research Scientist at Sony AI and a Visiting Assistant Professor in the Department of Applied Mathematics at National Yang Ming Chiao Tung University (Taiwan). His research focuses on deep generative modeling (with an emphasis on diffusion models) and AI for science. He has organized and delivered tutorials on generative AI at ISMIR 2024, ICASSP 2025, and IJCNN 2025. Recently, he led and authored a book, <i>The Principles of Diffusion Models</i>, which provides a systematic treatment of the foundations of diffusion models.</p>
+            <div class="photo g1"><span class="mono-initials">CL</span><img src="assets/people/lai.jpg" alt="Portrait of Chieh-Hsin (Jesse) Lai" loading="lazy" onerror="this.remove()"></div>
+            <div class="card-id"><div class="name"><a href="https://chiehhsinjesselai.github.io/ChiehHsinLai/" target="_blank" rel="noopener">Chieh-Hsin (Jesse) Lai</a></div><div class="aff">Sony AI</div></div>
+            <details class="bio-toggle">
+              <summary>Bio</summary>
+              <p class="bio">Chieh-Hsin (Jesse) Lai received his Ph.D. in Mathematics from the University of Minnesota in 2021. He is currently a Staff Research Scientist at Sony AI and a Visiting Assistant Professor in the Department of Applied Mathematics at National Yang Ming Chiao Tung University (Taiwan). His research focuses on deep generative modeling (with an emphasis on diffusion models) and AI for science. He has organized and delivered tutorials on generative AI at ISMIR 2024, ICASSP 2025, and IJCNN 2025. Recently, he led and authored a book, <i>The Principles of Diffusion Models</i>, which provides a systematic treatment of the foundations of diffusion models.</p>
+            </details>
             <p class="links"><a href="https://chiehhsinjesselai.github.io/ChiehHsinLai/" target="_blank" rel="noopener">Website ↗</a><a href="https://scholar.google.co.jp/citations?user=KDnKGu8AAAAJ&amp;hl=en" target="_blank" rel="noopener">Google Scholar ↗</a></p>
           </article>
           <article class="card">
-            <div class="card-head">
-              <div class="avatar g2"><span class="mono-initials">YM</span><img src="assets/people/mitsufuji.jpg" alt="Portrait of Yuki Mitsufuji" loading="lazy" onerror="this.remove()"></div>
-              <div class="card-id"><div class="name"><a href="https://www.yukimitsufuji.com/" target="_blank" rel="noopener">Yuki Mitsufuji</a></div><div class="aff">Sony AI · Sony Group</div></div>
-            </div>
-            <div class="card-divider"></div>
-            <p class="bio">Yuki Mitsufuji is a Distinguished Engineer at Sony Group Corporation and leads AI research at Sony AI, working at the intersection of creativity and artificial intelligence. He is also a Visiting Research Professor at New York University and an IEEE Senior Member. His research focuses on generative models and diffusion-based approaches for vision and audio. He has organized and delivered tutorials on diffusion models at international conferences such as ISMIR 2024, ICASSP 2025, and IJCNN 2025, and has given a series of lectures at the Tokyo Institute of Technology.</p>
-            <p class="links"><a href="https://www.yukimitsufuji.com/" target="_blank" rel="noopener">Website ↗</a></p>
-          </article>
-          <article class="card">
-            <div class="card-head">
-              <div class="avatar g3"><span class="mono-initials">SS</span><img src="assets/people/sahoo.png" alt="Portrait of Subham Sekhar Sahoo" loading="lazy" onerror="this.remove()"></div>
-              <div class="card-id"><div class="name"><a href="https://s-sahoo.com/" target="_blank" rel="noopener">Subham Sekhar Sahoo</a></div><div class="aff">MBZUAI · IFM</div></div>
-            </div>
-            <div class="card-divider"></div>
-            <p class="bio">Subham Sahoo is a Senior Research Scientist at the MBZUAI Institute of Foundation Models, where he leads a research team focused on diffusion language models (diffusion-LLMs). He holds a Ph.D. from Cornell University, where he conducted foundational work in this area. Most notably, he proposed the MDLM framework, which has played a pivotal role in shaping the field of discrete diffusion and has been adopted at industrial scale, such as ByteDance’s state-of-the-art diffusion-LLM and NVIDIA’s GenMol foundation model for drug discovery.</p>
+            <div class="photo g3"><span class="mono-initials">SS</span><img src="assets/people/sahoo.png" alt="Portrait of Subham Sekhar Sahoo" loading="lazy" onerror="this.remove()"></div>
+            <div class="card-id"><div class="name"><a href="https://s-sahoo.com/" target="_blank" rel="noopener">Subham Sekhar Sahoo</a></div><div class="aff">MBZUAI · IFM</div></div>
+            <details class="bio-toggle">
+              <summary>Bio</summary>
+              <p class="bio">Subham Sahoo is a Senior Research Scientist at the MBZUAI Institute of Foundation Models, where he leads a research team focused on diffusion language models (diffusion-LLMs). He holds a Ph.D. from Cornell University, where he conducted foundational work in this area. Most notably, he proposed the MDLM framework, which has played a pivotal role in shaping the field of discrete diffusion and has been adopted at industrial scale, such as ByteDance’s state-of-the-art diffusion-LLM and NVIDIA’s GenMol foundation model for drug discovery.</p>
+            </details>
             <p class="links"><a href="https://s-sahoo.com/" target="_blank" rel="noopener">Website ↗</a><a href="https://scholar.google.com/citations?user=Z7DoDbAAAAAJ&amp;hl=en" target="_blank" rel="noopener">Google Scholar ↗</a></p>
           </article>
+          <article class="card">
+            <div class="photo g2"><span class="mono-initials">SE</span><img src="assets/people/ermon.jpg" alt="Portrait of Stefano Ermon" loading="lazy" onerror="this.remove()"></div>
+            <div class="card-id"><div class="name"><a href="https://cs.stanford.edu/~ermon/" target="_blank" rel="noopener">Stefano Ermon</a></div><div class="aff">Stanford University</div></div>
+            <details class="bio-toggle">
+              <summary>Bio</summary>
+              <p class="bio">Stefano Ermon is an Associate Professor of Computer Science at Stanford University, where he is affiliated with the Stanford Artificial Intelligence Laboratory. His research centers on probabilistic modeling and generative AI, and his group has made foundational contributions to score-based and diffusion models, including score matching with Langevin dynamics, Score SDEs, and DDIM. He is also a co-founder of Inception, which builds diffusion-based large language models.</p>
+            </details>
+            <p class="links"><a href="https://cs.stanford.edu/~ermon/" target="_blank" rel="noopener">Website ↗</a><a href="https://scholar.google.com/citations?user=ogXTOZ4AAAAJ&amp;hl=en" target="_blank" rel="noopener">Google Scholar ↗</a></p>
+          </article>
+        </div>
+        <div class="organizers" data-reveal>
+          <h3>Organizers</h3>
+          <p>Jesse Lai <span class="aff">(Sony AI)</span>, Subham Sekhar Sahoo <span class="aff">(MBZUAI · IFM)</span>, Yuki Mitsufuji <span class="aff">(Sony AI)</span>, and Stefano Ermon <span class="aff">(Stanford University)</span></p>
         </div>
       </div>
     </section>
@@ -507,7 +518,7 @@
       <div class="wrap">
         <div data-reveal>
           <p class="eyebrow"><span class="idx">02</span> Schedule</p>
-          <h2 class="h">Two parts, three <span class="it">live demos</span>.</h2>
+          <h2 class="h">Three parts, <span class="it">three speakers</span>.</h2>
           <p class="lead" style="margin-top:22px">The tutorial starts at 9:00 AM AEDT on Monday, December 7, in the TikTok Ent Centre and runs in the order below. Per-session times will be posted closer to the event.</p>
         </div>
 
@@ -516,55 +527,11 @@
           <div class="sched-head">
             <div>
               <span class="pno">Part I</span>
-              <h3>Continuous Diffusion</h3>
-              <p>This section develops the theoretical and empirical foundations of diffusion and flow-map models for fast sampling on continuous data.</p>
+              <h3>Continuous Diffusion for Discrete Data</h3>
+              <p>Contents to be announced soon.</p>
             </div>
             <span class="inst">Instructor<b>Chieh-Hsin (Jesse) Lai</b></span>
           </div>
-          <div class="sched-row talk">
-            <span class="time">I · 01</span>
-            <span class="what">Continuous diffusion overview from three origins
-              <ul class="sub-list">
-                <li>Variational-based: VAE ➞ <a href="https://arxiv.org/abs/2006.11239" target="_blank" rel="noopener">DDPM</a></li>
-                <li>Score-based: Energy-based model ➞ <a href="https://arxiv.org/abs/2011.13456" target="_blank" rel="noopener">Score SDE</a></li>
-                <li>Flow-based: Normalizing flows ➞ <a href="https://arxiv.org/abs/2210.02747" target="_blank" rel="noopener">Flow matching</a> &amp; <a href="https://arxiv.org/abs/2209.03003" target="_blank" rel="noopener">Rectified flow</a></li>
-              </ul>
-            </span>
-            <span class="tag">Lecture</span>
-          </div>
-          <div class="sched-row talk">
-            <span class="time">I · 02</span>
-            <span class="what">Diffusion-motivated flow-map models as fast generators
-              <ul class="sub-list">
-                <li><a href="https://arxiv.org/abs/2303.01469" target="_blank" rel="noopener">Consistency Model (CM)</a></li>
-                <li><a href="https://arxiv.org/abs/2310.02279" target="_blank" rel="noopener">Consistency Trajectory Model (CTM)</a></li>
-                <li><a href="https://arxiv.org/abs/2505.13447" target="_blank" rel="noopener">MeanFlow (MF)</a></li>
-              </ul>
-            </span>
-            <span class="tag">Lecture</span>
-          </div>
-          <div class="sched-row talk">
-            <span class="time">I · 03</span>
-            <span class="what">Efficient flow-map training with <a href="https://arxiv.org/abs/2509.24526" target="_blank" rel="noopener">Consistency Mid-Training</a></span>
-            <span class="tag">Lecture</span>
-          </div>
-          <div class="sched-row oral">
-            <span class="time">I · 04</span>
-            <span class="what">Live Demo 1: Training a flow-map model</span>
-            <span class="tag">Live demo</span>
-          </div>
-        </div>
-
-        <!-- Interlude -->
-        <div class="sched" data-reveal style="margin-top:18px">
-          <div class="sched-row talk">
-            <span class="time">Interlude</span>
-            <span class="what">Audio-Visual Generation &amp; Protection of Creation
-              <span class="sm">Instructor: Yuki Mitsufuji. A brief look at AI content creation and protection, from diffusion memorization and attribution to audio-visual models such as <a href="https://github.com/hkchengrex/MMAudio" target="_blank" rel="noopener">MMAudio</a>, highlighting both creativity and the need for safeguards.</span>
-            </span>
-            <span class="tag">Lecture</span>
-          </div>
-          <div class="sched-row break"><span class="time">—</span><span class="what">Break</span><span class="tag">Break</span></div>
         </div>
 
         <!-- Part II -->
@@ -572,107 +539,51 @@
           <div class="sched-head">
             <div>
               <span class="pno">Part II</span>
-              <h3>Discrete Diffusion</h3>
-              <p>This section builds the theoretical and empirical foundation for diffusion when the data lives in discrete space.</p>
+              <h3>TBD</h3>
+              <p>Contents to be announced soon.</p>
+            </div>
+            <span class="inst">Instructor<b>Stefano Ermon</b></span>
+          </div>
+        </div>
+
+        <!-- Part III -->
+        <div class="sched" data-reveal style="margin-top:18px">
+          <div class="sched-head">
+            <div>
+              <span class="pno">Part III</span>
+              <h3>Designing Frontier Diffusion-LLMs</h3>
+              <p>This section examines where today's LLMs fall short and how diffusion and autoregressive LLMs can be combined to design superior LLMs.</p>
             </div>
             <span class="inst">Instructor<b>Subham Sekhar Sahoo</b></span>
           </div>
           <div class="sched-row talk">
-            <span class="time">II · 01</span>
-            <span class="what">Discrete diffusion overview
+            <span class="time">III · 01</span>
+            <span class="what">Limitations of current diffusion-LLMs
               <ul class="sub-list">
-                <li>Uniform-state diffusion: forward / reverse process</li>
-                <li>Training + implementation</li>
-                <li>Samplers</li>
+                <li>Case Study: Llada, Nemotron-Labs Diffusion, and Diffusion Gemma</li>
               </ul>
             </span>
-            <span class="tag">Lecture</span>
-          </div>
-          <div class="sched-row oral">
-            <span class="time">II · 02</span>
-            <span class="what">Live Demo 1: Image generation
-              <ul class="sub-list">
-                <li>Training a discrete diffusion model for image generation</li>
-                <li>Implement samplers: ancestral sampler, and Psi-sampler <a class="cite" href="#ref-2">[2]</a> for inference-time scaling</li>
-              </ul>
-            </span>
-            <span class="tag">Live demo</span>
+            <span class="tag">Case Study</span>
           </div>
           <div class="sched-row talk">
-            <span class="time">II · 03</span>
-            <span class="what">Self-distillation to accelerate sampling
+            <span class="time">III · 02</span>
+            <span class="what"><a href="https://s-sahoo.com/uno/" target="_blank" rel="noopener">Diffusion-Augmented LLMs</a>
               <ul class="sub-list">
-                <li>The discrete-space and continuous-space diffusion duality <a class="cite" href="#ref-1">[1]</a></li>
-                <li>Use the duality to design Discrete Consistency Distillation <a class="cite" href="#ref-1">[1]</a></li>
-                <li>Implementation</li>
+                <li>Fixing the quality issues in standard diffusion-LLMs</li>
+                <li>Unlocking diffusion capabilities in standard LLMs</li>
+                <li>Speeding up post-training and inference in standard LLMs via discrete diffusion</li>
               </ul>
             </span>
-            <span class="tag">Lecture</span>
+            <a class="tag" href="https://s-sahoo.com/uno/" target="_blank" rel="noopener">Materials ↗</a>
           </div>
           <div class="sched-row oral">
-            <span class="time">II · 04</span>
-            <span class="what">Live Demo 2: Discrete Consistency Distillation
-              <ul class="sub-list">
-                <li>Distill a pre-trained discrete diffusion model for faster inference via Discrete Consistency Distillation</li>
-                <li>Implement the Greedy-Tail sampler <a class="cite" href="#ref-1">[1]</a> for few-step generation</li>
-              </ul>
-            </span>
+            <span class="time">III · 03</span>
+            <span class="what">Live Demo: Building a Diffusion-Augmented LLM</span>
             <span class="tag">Live demo</span>
           </div>
         </div>
-        <p class="sched-legend">Session times to be announced · shown in program order.</p>
-      </div>
-    </section>
 
-    <!-- ===================== MATERIALS ===================== -->
-    <section id="materials" class="dark pad-y">
-      <div class="wrap">
-        <div data-reveal>
-          <p class="eyebrow"><span class="idx">03</span> Materials</p>
-          <h2 class="h">Book, slides &amp; <span class="it">notebooks</span>.</h2>
-          <p class="lead" style="margin-top:22px">Everything below is from the CVPR 2026 edition of this tutorial. NeurIPS 2026 slides and a recording will be added here.</p>
-        </div>
-        <div class="mat-grid" data-reveal>
-          <div class="mat">
-            <h3>Book &amp; references</h3>
-            <h4>Continuous diffusion</h4>
-            <ul>
-              <li><a href="https://the-principles-of-diffusion-models.github.io/" target="_blank" rel="noopener">The Principles of Diffusion Models <span aria-hidden="true">↗</span></a><span class="by">Chieh-Hsin Lai, Yang Song, Dongjun Kim, Yuki Mitsufuji, Stefano Ermon</span></li>
-            </ul>
-            <h4>Discrete diffusion</h4>
-            <ul>
-              <li><a href="https://s-sahoo.com/mdlm/" target="_blank" rel="noopener">Simple and Effective Masked Diffusion Models <span aria-hidden="true">↗</span></a></li>
-              <li id="ref-1"><a href="https://s-sahoo.com/duo/" target="_blank" rel="noopener">[1] The Diffusion Duality <span aria-hidden="true">↗</span></a><span class="by">Subham Sekhar Sahoo, Justin Deschenaux, Aaron Gokaslan, Guanghan Wang, Justin Chiu, Volodymyr Kuleshov · ICML 2025</span></li>
-              <li id="ref-2"><a href="https://s-sahoo.com/duo-ch2" target="_blank" rel="noopener">[2] The Diffusion Duality, Chapter II: Psi-Samplers and Efficient Curriculum <span aria-hidden="true">↗</span></a><span class="by">Justin Deschenaux, Caglar Gulcehre, Subham Sekhar Sahoo · ICLR 2026</span></li>
-            </ul>
-          </div>
-          <div class="mat">
-            <h3>Colab notebooks</h3>
-            <h4>Continuous diffusion</h4>
-            <ul>
-              <li><a href="https://colab.research.google.com/github/the-principles-of-diffusion-models/codes-demos/blob/main/Part-B/diffusion_tutorial.ipynb" target="_blank" rel="noopener">Part 1: Fundamentals of continuous diffusion <span aria-hidden="true">↗</span></a></li>
-              <li><a href="https://colab.research.google.com/github/the-principles-of-diffusion-models/codes-demos/blob/main/Part-D/flow_map_tutorial.ipynb" target="_blank" rel="noopener">Part 2: Consistency Model, Consistency Trajectory Model, MeanFlow <span aria-hidden="true">↗</span></a></li>
-            </ul>
-            <h4>Discrete diffusion</h4>
-            <ul>
-              <li><a href="https://drive.google.com/file/d/1-RehWZxGdLRMTcb8PUIs3PbiZv5w__vO/view?usp=sharing" target="_blank" rel="noopener">Part 1: Fundamentals of uniform-state diffusion <span aria-hidden="true">↗</span></a></li>
-              <li><a href="https://colab.research.google.com/drive/1YGN2U8rz68KCv6AE_V3TPULgd18MkBv-?usp=sharing" target="_blank" rel="noopener">Part 2: Inference-time scaling with Psi-samplers <span aria-hidden="true">↗</span></a></li>
-              <li><a href="https://colab.research.google.com/drive/1K5upe_hDNkKEEbCRRk8QVxpkZPTYWRee?usp=sharing" target="_blank" rel="noopener">Part 3: Few-step generation <span aria-hidden="true">↗</span></a></li>
-            </ul>
-          </div>
-          <div class="mat">
-            <h3>Slides &amp; recording</h3>
-            <h4>Slides</h4>
-            <ul>
-              <li><a href="https://drive.google.com/file/d/1qvj99WY-gzDD54TOaNCkW2eTYal4aSSi/view?usp=sharing" target="_blank" rel="noopener">Continuous diffusion slides <span aria-hidden="true">↗</span></a></li>
-              <li>Discrete diffusion slides <span class="tbd" title="To be posted">coming soon</span></li>
-            </ul>
-            <h4>Recording</h4>
-            <ul><li><span class="tbd" title="To be posted after the tutorial">To be posted</span></li></ul>
-            <h4>How to cite</h4>
-            <ul><li><span class="tbd" title="To be posted">To be posted</span></li></ul>
-          </div>
-        </div>
+        <p class="sched-legend">Session times to be announced · shown in program order.</p>
       </div>
     </section>
   </main>
@@ -702,6 +613,16 @@
       };
       onScroll();
       window.addEventListener('scroll', onScroll, {passive:true});
+
+      /* ---------- Bio toggles open/close together ---------- */
+      var bios = document.querySelectorAll('.bio-toggle');
+      Array.prototype.forEach.call(bios, function(d){
+        d.querySelector('summary').addEventListener('click', function(e){
+          e.preventDefault();
+          var open = !d.open;
+          Array.prototype.forEach.call(bios, function(b){ b.open = open; });
+        });
+      });
 
       /* ---------- Mobile drawer ---------- */
       var toggle = document.getElementById('navToggle');
@@ -792,14 +713,15 @@
               var base = (x/cols)*0.35 + (y/rows)*0.25;
               cells.push({
                 x:x, y:y, ci:ci,
-                order: Math.max(0, Math.min(1, base + (Math.sin(x*12.9898 + y*78.233)*43758.5453 % 1) * 0.55 )),
-                seed: (x*7 + y*13) % 97
+                order: Math.max(0, Math.min(1, base + (Math.sin(x*12.9898 + y*78.233)*43758.5453 % 1) * 0.55 ))
               });
             }
           }
         }
         function smooth(t){ t = t<0?0:(t>1?1:t); return t*t*(3-2*t); }
-        var PERIOD = 9200; // ms
+        var REVEAL = 5520, HOLD = 400, FADE = 1100; // ms
+        var PERIOD = REVEAL + HOLD + FADE;
+        var R_END = REVEAL/PERIOD, H_END = (REVEAL+HOLD)/PERIOD;
         var last = 0;
         var startTime = null;
         function frame(ts){
@@ -819,12 +741,12 @@
           for(var i=0;i<cells.length;i++){
             var c = cells[i];
             var prog;
-            if(p < 0.60){                    // parallel reveal
-              prog = smooth((p/0.60 - c.order)/0.16);
-            } else if(p < 0.82){             // hold resolved
+            if(p < R_END){                   // parallel reveal
+              prog = smooth((p/R_END - c.order)/0.16);
+            } else if(p < H_END){            // hold resolved
               prog = 1;
             } else {                          // re-noise (reverse order)
-              var rp = (p-0.82)/0.18;
+              var rp = (p-H_END)/(1-H_END);
               prog = 1 - smooth((rp - (1-c.order))/0.16);
             }
             var px = c.x*cell + pad;
@@ -835,19 +757,6 @@
               ctx.fillStyle = COLORS[c.ci];
               rrect(px, py, size, size, size*0.22);
               ctx.fill();
-            }
-            // noise (masked token): flickering dots while unresolved
-            if(prog < 0.98){
-              var noise = (1-prog);
-              ctx.globalAlpha = noise * 0.5;
-              ctx.fillStyle = '#7c84b8';
-              var t = Math.floor(elapsed/90) + c.seed;
-              for(var d=0; d<3; d++){
-                var rx = ((Math.sin((t+d)*12.9 + c.seed)*43758.5)%1+1)%1;
-                var ry = ((Math.sin((t+d)*78.2 + c.seed*3)*43758.5)%1+1)%1;
-                var ds = size*0.13;
-                ctx.fillRect(px + rx*(size-ds), py + ry*(size-ds), ds, ds);
-              }
             }
           }
           ctx.globalAlpha = 1;
@@ -864,10 +773,6 @@
             if(prog>0.02){
               ctx.globalAlpha = prog*0.9; ctx.fillStyle=COLORS[c.ci];
               rrect(px,py,size,size,size*0.22); ctx.fill();
-            }
-            if(prog<0.9){
-              ctx.globalAlpha=(1-prog)*0.4; ctx.fillStyle='#7c84b8';
-              ctx.fillRect(px+size*0.3, py+size*0.3, size*0.14, size*0.14);
             }
           }
           ctx.globalAlpha=1;
